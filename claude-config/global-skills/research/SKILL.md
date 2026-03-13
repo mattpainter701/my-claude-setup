@@ -87,9 +87,13 @@ When `PERPLEXITY_API_KEY` is set, use Perplexity's Sonar API as the **primary re
 ### Setup
 
 1. Get an API key at [console.perplexity.ai](https://console.perplexity.ai)
-2. Set the environment variable:
+2. Add to `~/.config/secrets.env` (outside all git repos — never committed):
    ```bash
-   export PERPLEXITY_API_KEY=pplx-xxxxxxxxxxxxxxxxxxxx
+   PERPLEXITY_API_KEY=pplx-xxxxxxxxxxxxxxxxxxxx
+   ```
+3. Load before use (or add to shell profile):
+   ```bash
+   export $(grep -v '^#' ~/.config/secrets.env | grep -v '^$' | xargs)
    ```
 
 ### API Reference
@@ -119,12 +123,15 @@ response = client.chat.completions.create(
 
 ### Models
 
+**Default: `sonar-pro`** for all queries. Claude handles reasoning — Perplexity is the search layer.
+
 | Model | Use Case | Input/1M | Output/1M | Request/1K |
 |-|-|-|-|-|
-| `sonar` | Quick factual lookups, simple queries | $1 | $1 | $5-12 |
-| `sonar-pro` | Complex queries, follow-ups, multi-step | $3 | $15 | $6-14 |
-| `sonar-reasoning-pro` | Chain-of-thought, logical analysis | $2 | $8 | $6-14 |
-| `sonar-deep-research` | Exhaustive multi-source research reports | $2 | $8 | — |
+| `sonar-pro` | **Default.** Complex queries, follow-ups, multi-step search | $3 | $15 | $6-14 |
+| `sonar` | Budget fallback for trivial lookups | $1 | $1 | $5-12 |
+| `sonar-deep-research` | Exhaustive multi-source reports ("deep dive" prefix) | $2 | $8 | — |
+
+`sonar-reasoning-pro` is not used — Claude does the reasoning, Perplexity does the searching.
 
 Request fees vary by search context depth (low/medium/high). No free tier.
 
@@ -169,44 +176,33 @@ The response extends OpenAI's format with a `citations` array:
 
 Inline `[1]`, `[2]` markers in the content map to the `citations` array indices. Extract these for the Sources section of the research report.
 
-### When to Use Which Model
-
-| Research Type | Model | Why |
-|-|-|-|
-| Quick fact check | `sonar` | Cheapest, fast, good enough for simple lookups |
-| Library comparison | `sonar-pro` | Handles nuance, follow-ups, multi-faceted queries |
-| Architecture decision | `sonar-reasoning-pro` | Chain-of-thought for trade-off analysis |
-| Deep dive / thorough | `sonar-deep-research` | Exhaustive multi-source synthesis |
-
 ### Research Process with Perplexity
 
-When `PERPLEXITY_API_KEY` is available, modify Step 3:
+When `PERPLEXITY_API_KEY` is available, modify Step 3. Use `sonar-pro` for everything — Claude does the reasoning on top of the search results.
 
 **For libraries/frameworks:**
 1. Resolve via Context7 first (authoritative docs)
-2. Use `sonar-pro` with `search_domain_filter` targeting the library's domain for recent updates, known issues, migration guides
+2. `sonar-pro` with `search_domain_filter` targeting the library's domain for recent updates, known issues, migration guides
 3. Fall back to WebSearch only if Perplexity returns no citations
 
 **For techniques/patterns:**
-1. Use `sonar-reasoning-pro` for architectural trade-off questions
-2. Use `sonar` for quick factual lookups (e.g., "what's the default I2C pull-up resistance")
-3. Domain-filter to authoritative sources when applicable (e.g., `["ipc.org", "ti.com"]` for hardware)
+1. `sonar-pro` with domain filter to authoritative sources (e.g., `["ipc.org", "ti.com"]` for hardware)
+2. Claude reasons about the search results — no need for Perplexity's reasoning models
 
 **For comparisons:**
 1. Single `sonar-pro` call with both options in the prompt — Perplexity synthesizes across sources
-2. Verify key claims with a targeted `sonar` follow-up if numbers seem off
+2. Claude evaluates trade-offs from the grounded search results
 
 **For "deep dive" or "thorough" requests:**
-1. Use `sonar-deep-research` — it runs multi-step searches internally and returns comprehensive reports
+1. Use `sonar-deep-research` — the one exception. It runs multi-step searches internally and returns comprehensive reports
 2. Extract citations from the response for the Sources section
-3. Cross-reference critical findings against codebase (Grep/Glob)
+3. Claude cross-references findings against codebase (Grep/Glob)
 
 ### Cost Control
 
-- Default to `sonar` (~$0.005-0.012/query) for simple lookups
-- Escalate to `sonar-pro` only for complex or multi-faceted questions
-- Reserve `sonar-deep-research` for explicit "deep dive" requests
-- A typical `/research` call costs $0.01-0.05 depending on model and output length
+- `sonar-pro` is the default (~$0.01-0.03/query) — good balance of quality and cost
+- Reserve `sonar-deep-research` for explicit "deep dive" requests (~$0.03-0.05/query)
+- A typical `/research` call costs $0.01-0.03
 
 ### Search API (Alternative)
 
@@ -228,7 +224,7 @@ To fully integrate Perplexity into this skill:
   - Bash script: `~/.claude/scripts/perplexity_search.py` called via Bash tool
   - Direct curl: Inline curl calls (works but verbose)
 - [ ] **Credential handling:** Load `PERPLEXITY_API_KEY` from `~/.config/secrets.env` or environment
-- [ ] **Model routing logic:** Auto-select model based on query complexity and user prefix ("deep dive" → deep-research, default → sonar)
+- [ ] **Model routing logic:** Default `sonar-pro` for all queries; `sonar-deep-research` only when user prefixes with "deep dive" or "thorough"
 - [ ] **Citation extraction:** Parse `[N]` markers from response content, map to `citations[]` URLs, format for Sources section
 - [ ] **Fallback chain:** Perplexity → WebSearch → Context7 (graceful degradation if API key missing or quota exceeded)
 - [ ] **Add to allowed-tools:** Update skill frontmatter to include the Perplexity tool once implemented
