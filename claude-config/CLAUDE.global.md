@@ -50,14 +50,21 @@
 - `/clear` between unrelated tasks. Context pollution causes drift.
 - Two-correction rule: if corrected twice on same issue, /clear and restart.
 - After `/clear`, use `/catchup` to restore git context.
+- **Manual `/compact` at ~50% context** — don't wait for auto-compact. Earlier compaction preserves more useful context than late emergency compaction.
+- **`Esc Esc` or `/rewind`** to undo a bad Claude action. Better than trying to fix mistakes in degraded context — rewind and retry with a clearer prompt.
 
 ## Compaction Guidance
 When compacting, preserve: modified file list, test commands and results,
 current sprint/task numbers, the specific bug or feature being worked on.
 
 ## Agents
-- **code-reviewer:** @~/.claude/agents/code-reviewer.md — fresh-context code review
-- **session-analyst:** @~/.claude/agents/session-analyst.md — session log analysis
+- **code-reviewer:** @~/.claude/agents/code-reviewer.md — fresh-context code review (worktree isolation, project memory)
+- **session-analyst:** @~/.claude/agents/session-analyst.md — session log analysis (user memory)
+- **hardware-reviewer:** @~/.claude/agents/hardware-reviewer.md — KiCad schematic + PCB review (worktree isolation, project memory)
+- **research-analyst:** @~/.claude/agents/research-analyst.md — Perplexity + codebase research (project memory)
+- **bom-auditor:** @~/.claude/agents/bom-auditor.md — BOM completeness & sourcing audit (project memory)
+- **deployment-validator:** @~/.claude/agents/deployment-validator.md — pre-deploy safety checklist (project memory)
+- **sprint-planner:** @~/.claude/agents/sprint-planner.md — velocity-based sprint planning (project memory)
 
 ## Tools
 - **jq:** Installed via winget. Used by hook scripts for JSON parsing.

@@ -13,8 +13,9 @@ isolated agent so the reviewer has no implementation bias from the main session.
    - If empty: review `git diff --cached` (staged changes), or `git diff HEAD~1..HEAD` if nothing staged
 
 2. **Spawn a review agent** using the Agent tool:
-   - `subagent_type`: `general-purpose`
+   - `subagent_type`: `code-reviewer`
    - `model`: `opus`
+   - `isolation`: `worktree` (gives the reviewer an isolated copy of the repo)
    - Include this system prompt in the agent's task:
 
    ```
