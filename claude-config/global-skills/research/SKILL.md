@@ -204,16 +204,33 @@ When `PERPLEXITY_API_KEY` is available, modify Step 3. Use `sonar-pro` for every
 - Reserve `sonar-deep-research` for explicit "deep dive" requests (~$0.03-0.05/query)
 - A typical `/research` call costs $0.01-0.03
 
-### Search API (Alternative)
+### Two APIs — When to Use Which
 
-For raw ranked results without AI synthesis — useful when you need URLs to WebFetch yourself:
+Perplexity offers two distinct APIs. We use Chat Completions by default.
 
+| | Chat Completions (default) | Search API |
+|-|-|-|
+| Endpoint | `POST /chat/completions` | `POST /search` |
+| Returns | AI-synthesized answer + `citations[]` | Raw results: `{title, url, snippet, date}` |
+| Model param | `sonar-pro` (required) | None (no AI synthesis) |
+| Pricing | Token-based + request fee (~$0.01-0.03) | $5/1K requests flat |
+| Domain filter | `search_domain_filter` (top-level param, verified working) | `search_domain_filter` (top-level param) |
+| Best for | Research answers with cited sources | Getting URLs to WebFetch/Read yourself |
+
+**Chat Completions** — default for `/research`. Returns a synthesized answer with inline `[N]` citation markers mapped to the `citations[]` array. `search_domain_filter` works as a top-level request parameter (verified).
+
+**Search API** — use when you need raw URLs to fetch and parse yourself, or when you want structured snippets without AI interpretation:
+
+```bash
+curl -X POST https://api.perplexity.ai/search \
+  -H "Authorization: Bearer $PERPLEXITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"query":"KrakenSDR drone DF accuracy","max_results":5}'
 ```
-POST https://api.perplexity.ai/search
-{"query": ["ADRV9002 evaluation board schematic"]}
-```
 
-Returns `{title, url}` pairs. $5/1K requests. Use when you need to fetch and parse pages yourself rather than trust the AI summary.
+Response: `{"id":"uuid","results":[{"title":"...","url":"...","snippet":"...","date":"YYYY-MM-DD","last_updated":"YYYY-MM-DD"}]}`
+
+Search API params: `query` (string or array, up to 5 batch), `max_results` (1-20, default 10), `country` (ISO 3166-1), `search_domain_filter` (max 20, prefix `-` to deny), `search_language_filter` (ISO 639-1, max 10), `max_tokens_per_page` (default 4096), `max_tokens` (default 10000, max 1M).
 
 ### Implementation Checklist
 
