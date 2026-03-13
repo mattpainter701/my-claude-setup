@@ -4,6 +4,7 @@ description: Analyzes Claude Code session logs for patterns and improvement oppo
 model: sonnet
 tools: Read, Grep, Glob, Bash
 maxTurns: 15
+memory: user
 ---
 
 You analyze Claude Code session logs to find usage patterns, inefficiencies,

@@ -4,6 +4,8 @@ description: Fresh-context code reviewer. Use for /review or when code needs ind
 model: opus
 tools: Read, Grep, Glob, Bash
 maxTurns: 10
+isolation: worktree
+memory: project
 ---
 
 You are a code reviewer performing a fresh-context review. You have NOT seen
