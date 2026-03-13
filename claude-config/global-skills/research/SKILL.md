@@ -1,15 +1,17 @@
 ---
 name: research
 description: >
-  Deep research on any topic. Searches the web, documentation, and codebase.
-  Returns a structured report with sources and actionable recommendations.
+  Deep research on any topic. Parallel Perplexity web search + Claude codebase analysis.
+  Returns a structured report with cited sources and actionable recommendations.
 context: fork
 allowed-tools:
+  - Bash
   - WebSearch
   - WebFetch
   - Read
   - Grep
   - Glob
+  - Agent
   - mcp__plugin_context7_context7__resolve-library-id
   - mcp__plugin_context7_context7__query-docs
 ---
@@ -20,235 +22,227 @@ Usage: `/research <question or topic>`
 
 You are conducting research on: `$ARGUMENTS`
 
+## Architecture
+
+```
+User: /research <raw query>
+  |
+  Step 1: NORMALIZE — Claude rewrites query for Perplexity + picks domain filters
+  |
+  Step 2: PARALLEL SEARCH (launch both simultaneously)
+  |   |
+  |   +-- Perplexity (background Bash) ---- sonar-pro web search + citations
+  |   |
+  |   +-- Claude (inline) ---------------- codebase Grep/Glob, memory, Context7
+  |
+  Step 3: MERGE — Claude reads Perplexity JSON, cross-references with codebase findings
+  |
+  Step 4: REPORT — structured output with both source sets merged
+  |
+  Step 5: SAVE — durable findings to project memory if applicable
+```
+
+Perplexity is the search layer. Claude is the reasoning layer. They run in parallel.
+
 ## Process
 
-### 1. Understand the Question
-Parse the research topic. Identify:
-- Is this about a library/framework? (use Context7)
-- Is this about a technique/pattern? (use WebSearch)
-- Is this about something in the current codebase? (use Grep/Glob)
-- Is this a comparison? (research both sides)
+### Step 1: Normalize the Query
 
-### 2. Check Existing Knowledge
-- Read `memory/MEMORY.md` if it exists — check for prior findings on this topic
-- Search the codebase for related implementations (`Grep` for keywords)
+Before searching, rewrite the user's raw question into:
 
-### 3. Research
+1. **Perplexity query** — a precise, search-optimized prompt. Add specifics the user implied:
+   - Expand acronyms (e.g., "DF" → "direction finding")
+   - Add year range ("2024-2025" for state-of-art questions)
+   - Add technical context ("for SDR-based drone detection" if that's the project domain)
+   - Keep under 200 words — Perplexity works best with focused queries
 
-**For libraries/frameworks:**
-1. Resolve the library ID via Context7
-2. Query Context7 docs for the specific question
-3. WebSearch for recent updates, known issues, alternatives
+2. **Domain filter** — pick 3-5 authoritative domains for the topic:
+   - Hardware/RF: `ieee.org`, `analog.com`, `ti.com`, `mdpi.com`, `arxiv.org`
+   - Software/libraries: the library's official docs domain
+   - Components: `digikey.com`, `mouser.com`, manufacturer sites
+   - General tech: omit filter (let Perplexity search broadly)
 
-**For techniques/patterns:**
-1. WebSearch with specific, current-year queries
-2. WebFetch key results for detailed reading
-3. Search codebase for existing implementations of similar patterns
+3. **Recency filter** — set if the user wants current info:
+   - "latest", "2025", "recent" → `--recency month`
+   - Historical/foundational → omit
 
-**For comparisons:**
-1. Research each option independently
-2. Find benchmarks, adoption data, maintenance status
-3. Check compatibility with existing project stack
+4. **Codebase keywords** — extract 2-3 grep patterns for local search:
+   - Function names, module names, config keys related to the topic
 
-### 4. Produce Report
+### Step 2: Parallel Search
 
-Structure your response exactly like this:
+Launch **both searches simultaneously** — do not wait for one before starting the other.
 
-**Summary:** 2-3 sentences answering the question directly.
+**Perplexity (background Bash):**
+```bash
+py ~/.claude/scripts/perplexity_search.py "<normalized query>" \
+  --domains "domain1.com,domain2.com" \
+  --recency month \
+  --max-tokens 2048
+```
+
+The script loads `PERPLEXITY_API_KEY` from `~/.config/secrets.env` automatically. Returns JSON:
+```json
+{
+  "content": "AI-synthesized answer with [1] citation markers...",
+  "citations": ["https://source1.com", "https://source2.com"],
+  "model": "sonar-pro",
+  "tokens_in": 100,
+  "tokens_out": 1500
+}
+```
+
+**Claude (inline, simultaneously):**
+- `Grep` codebase for related implementations, configs, prior work
+- `Read` `memory/MEMORY.md` — check for prior findings on this topic
+- `Grep` existing research docs in `docs/research/` for overlap
+- If library/framework: resolve via Context7, query docs
+- If no Perplexity key: fall back to `WebSearch` + `WebFetch`
+
+### Step 3: Merge
+
+Read the Perplexity JSON result. Now Claude has two datasets:
+
+| Source | Provides |
+|-|-|
+| Perplexity | Current web knowledge, citations, external state-of-art |
+| Claude inline | Codebase context, project history, existing implementations, memory |
+
+Cross-reference:
+- Do Perplexity's findings align with what's already in the codebase?
+- Does the codebase have partial implementations that Perplexity's sources could improve?
+- Are there contradictions between web sources and existing project decisions?
+- Which Perplexity citations are most relevant to this specific project?
+
+### Step 4: Produce Report
+
+Structure the final output:
+
+---
+
+**Summary:** 2-3 sentences answering the question directly. Lead with the answer.
 
 **Key Findings:**
 - Bullet points with specifics (versions, numbers, dates)
 - Include code snippets where relevant
 - Note any caveats or limitations
+- Mark provenance: `[web]` for Perplexity-sourced, `[codebase]` for local findings
 
 **Sources:**
-- [Title](URL) — 1-line description of what this source covers
+- [Title](URL) — 1-line description (from Perplexity citations)
+- `path/to/file.py:42` — relevant codebase reference (from Claude inline)
 
-**Codebase Relevance:**
-- Existing files/patterns that relate to this research
-- Whether the codebase already has a partial implementation
+**Project Alignment:**
+- How findings relate to current project architecture/goals
+- Existing files/patterns that connect to this research
+- Gaps between state-of-art and current implementation
 
 **Recommendations:**
 - Actionable next steps (1-3 items)
 - If this is a library choice, give a clear recommendation with reasoning
 
-### 5. Save Durable Findings
+**Research Stats:** `sonar-pro`, N tokens in, M tokens out, K citations
+
+---
+
+### Step 5: Save Durable Findings
+
 If the research revealed:
 - A connection method or endpoint → save to project memory
 - An architecture decision or library evaluation → save to project memory
 - A tool/workflow preference → consider for CLAUDE.md
+- A key reference document → note in memory for future sessions
 
 Only save information that will be useful in future sessions. Don't save one-off answers.
 
-## Perplexity Integration (Enhanced Research)
+## Fallback Chain
 
-When `PERPLEXITY_API_KEY` is set, use Perplexity's Sonar API as the **primary research backend** before falling back to WebSearch. Perplexity returns grounded, cited answers from live web search — eliminating the WebSearch → WebFetch → parse chain.
+If Perplexity is unavailable (no API key, 401, 429, timeout):
 
-### Setup
+1. **WebSearch** — Claude's built-in web search (less precise, no citations array)
+2. **WebFetch** — fetch specific URLs from WebSearch results
+3. **Context7** — library/framework docs (always available)
+4. **Codebase only** — Grep/Glob local findings (always available)
 
-1. Get an API key at [console.perplexity.ai](https://console.perplexity.ai)
-2. Add to `~/.config/secrets.env` (outside all git repos — never committed):
-   ```bash
-   PERPLEXITY_API_KEY=pplx-xxxxxxxxxxxxxxxxxxxx
-   ```
-3. Load before use (or add to shell profile):
-   ```bash
-   export $(grep -v '^#' ~/.config/secrets.env | grep -v '^$' | xargs)
-   ```
+Never fail silently. If Perplexity errors, report the error and continue with fallback sources.
 
-### API Reference
+## Perplexity Wrapper Script
 
-**Endpoint:** `POST https://api.perplexity.ai/chat/completions`
+**Location:** `~/.claude/scripts/perplexity_search.py`
 
-**Auth:** `Authorization: Bearer $PERPLEXITY_API_KEY`
+```bash
+# Chat Completions (default — AI synthesis + citations)
+py ~/.claude/scripts/perplexity_search.py "query" --domains d1.com,d2.com --recency month
 
-**OpenAI-compatible** — use the OpenAI SDK with `base_url` override:
-```python
-from openai import OpenAI
+# Search API (raw ranked results — title, URL, snippet)
+py ~/.claude/scripts/perplexity_search.py "query" --search-api --max-results 10
 
-client = OpenAI(
-    api_key=os.environ["PERPLEXITY_API_KEY"],
-    base_url="https://api.perplexity.ai",
-)
-
-response = client.chat.completions.create(
-    model="sonar-pro",
-    messages=[
-        {"role": "system", "content": "Be precise and cite sources."},
-        {"role": "user", "content": "What are the ADRV9002 vs AD9361 key differences?"},
-    ],
-)
-# response.citations contains source URLs
+# Deep research (use sparingly — expensive)
+py ~/.claude/scripts/perplexity_search.py "query" --model sonar-deep-research
 ```
 
-### Models
+The script:
+- Loads `PERPLEXITY_API_KEY` from `~/.config/secrets.env` or environment (no manual export needed)
+- Returns structured JSON to stdout
+- Handles errors gracefully (returns `{"error": "..."}`)
+- No dependencies beyond stdlib (`urllib`)
 
-**Default: `sonar-pro`** for all queries. Claude handles reasoning — Perplexity is the search layer.
+## Credential Setup
 
-| Model | Use Case | Input/1M | Output/1M | Request/1K |
-|-|-|-|-|-|
-| `sonar-pro` | **Default.** Complex queries, follow-ups, multi-step search | $3 | $15 | $6-14 |
-| `sonar` | Budget fallback for trivial lookups | $1 | $1 | $5-12 |
-| `sonar-deep-research` | Exhaustive multi-source reports ("deep dive" prefix) | $2 | $8 | — |
-
-`sonar-reasoning-pro` is not used — Claude does the reasoning, Perplexity does the searching.
-
-Request fees vary by search context depth (low/medium/high). No free tier.
-
-### Request Parameters
-
-```json
-{
-  "model": "sonar-pro",
-  "messages": [{"role": "user", "content": "..."}],
-  "search_domain_filter": ["arxiv.org", "ti.com"],
-  "search_recency_filter": "month",
-  "return_related_questions": true,
-  "temperature": 0.2,
-  "max_tokens": 2048,
-  "stream": false
-}
+API key lives in `~/.config/secrets.env` (outside all git repos):
+```bash
+PERPLEXITY_API_KEY=pplx-xxxxxxxxxxxxxxxxxxxx
 ```
+
+Get a key at [console.perplexity.ai](https://console.perplexity.ai). No free tier — sonar-pro costs ~$0.01-0.03 per query.
+
+## Models
+
+**Default: `sonar-pro`** for all queries. Claude handles reasoning — Perplexity is search only.
+
+| Model | Use Case | Cost/query |
+|-|-|-|
+| `sonar-pro` | **Default.** All research queries | ~$0.01-0.03 |
+| `sonar-deep-research` | "deep dive" / "thorough" prefix only | ~$0.03-0.05 |
+
+`sonar-reasoning-pro` is not used — Claude is the reasoning layer.
+
+## API Quick Reference
+
+### Chat Completions (default)
+
+`POST https://api.perplexity.ai/chat/completions`
 
 | Parameter | Type | Description |
 |-|-|-|
-| `model` | string | Required. One of the sonar models above. |
-| `messages` | array | Required. OpenAI-format message array. |
-| `search_domain_filter` | string[] | Restrict search to specific domains (e.g., `["ti.com", "analog.com"]`). |
-| `search_recency_filter` | string | `"hour"`, `"day"`, `"week"`, `"month"`. Limits to recent results. |
-| `return_related_questions` | bool | Include follow-up question suggestions. |
-| `temperature` | float | 0.0-1.0. Lower = more factual. Default 0.2. |
-| `max_tokens` | int | Max output tokens. |
-| `stream` | bool | SSE streaming. |
+| `model` | string | `sonar-pro` (default) or `sonar-deep-research` |
+| `messages` | array | OpenAI-format `[{role, content}]` |
+| `search_domain_filter` | string[] | Restrict to specific domains (verified working) |
+| `search_recency_filter` | string | `hour`, `day`, `week`, `month` |
+| `temperature` | float | 0.0-1.0 (default 0.2) |
+| `max_tokens` | int | Max output tokens (default 2048) |
 
-### Response — Citations
+Response includes `citations[]` array. Inline `[N]` markers in content map to citation indices.
 
-The response extends OpenAI's format with a `citations` array:
-```json
-{
-  "choices": [{"message": {"role": "assistant", "content": "The ADRV9002 [1]..."}}],
-  "citations": [
-    "https://www.analog.com/en/products/adrv9002.html",
-    "https://www.ti.com/..."
-  ]
-}
-```
+### Search API (raw results)
 
-Inline `[1]`, `[2]` markers in the content map to the `citations` array indices. Extract these for the Sources section of the research report.
+`POST https://api.perplexity.ai/search`
 
-### Research Process with Perplexity
-
-When `PERPLEXITY_API_KEY` is available, modify Step 3. Use `sonar-pro` for everything — Claude does the reasoning on top of the search results.
-
-**For libraries/frameworks:**
-1. Resolve via Context7 first (authoritative docs)
-2. `sonar-pro` with `search_domain_filter` targeting the library's domain for recent updates, known issues, migration guides
-3. Fall back to WebSearch only if Perplexity returns no citations
-
-**For techniques/patterns:**
-1. `sonar-pro` with domain filter to authoritative sources (e.g., `["ipc.org", "ti.com"]` for hardware)
-2. Claude reasons about the search results — no need for Perplexity's reasoning models
-
-**For comparisons:**
-1. Single `sonar-pro` call with both options in the prompt — Perplexity synthesizes across sources
-2. Claude evaluates trade-offs from the grounded search results
-
-**For "deep dive" or "thorough" requests:**
-1. Use `sonar-deep-research` — the one exception. It runs multi-step searches internally and returns comprehensive reports
-2. Extract citations from the response for the Sources section
-3. Claude cross-references findings against codebase (Grep/Glob)
-
-### Cost Control
-
-- `sonar-pro` is the default (~$0.01-0.03/query) — good balance of quality and cost
-- Reserve `sonar-deep-research` for explicit "deep dive" requests (~$0.03-0.05/query)
-- A typical `/research` call costs $0.01-0.03
-
-### Two APIs — When to Use Which
-
-Perplexity offers two distinct APIs. We use Chat Completions by default.
-
-| | Chat Completions (default) | Search API |
+| Parameter | Type | Description |
 |-|-|-|
-| Endpoint | `POST /chat/completions` | `POST /search` |
-| Returns | AI-synthesized answer + `citations[]` | Raw results: `{title, url, snippet, date}` |
-| Model param | `sonar-pro` (required) | None (no AI synthesis) |
-| Pricing | Token-based + request fee (~$0.01-0.03) | $5/1K requests flat |
-| Domain filter | `search_domain_filter` (top-level param, verified working) | `search_domain_filter` (top-level param) |
-| Best for | Research answers with cited sources | Getting URLs to WebFetch/Read yourself |
+| `query` | string/array | Up to 5 queries for batch |
+| `max_results` | int | 1-20 (default 10) |
+| `search_domain_filter` | string[] | Max 20 domains, prefix `-` to deny |
+| `search_recency_filter` | string | Same as above |
+| `country` | string | ISO 3166-1 alpha-2 |
 
-**Chat Completions** — default for `/research`. Returns a synthesized answer with inline `[N]` citation markers mapped to the `citations[]` array. `search_domain_filter` works as a top-level request parameter (verified).
-
-**Search API** — use when you need raw URLs to fetch and parse yourself, or when you want structured snippets without AI interpretation:
-
-```bash
-curl -X POST https://api.perplexity.ai/search \
-  -H "Authorization: Bearer $PERPLEXITY_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"query":"KrakenSDR drone DF accuracy","max_results":5}'
-```
-
-Response: `{"id":"uuid","results":[{"title":"...","url":"...","snippet":"...","date":"YYYY-MM-DD","last_updated":"YYYY-MM-DD"}]}`
-
-Search API params: `query` (string or array, up to 5 batch), `max_results` (1-20, default 10), `country` (ISO 3166-1), `search_domain_filter` (max 20, prefix `-` to deny), `search_language_filter` (ISO 639-1, max 10), `max_tokens_per_page` (default 4096), `max_tokens` (default 10000, max 1M).
-
-### Implementation Checklist
-
-To fully integrate Perplexity into this skill:
-
-- [ ] **MCP server or script:** Create a Perplexity MCP tool or wrapper script that Claude can call via Bash. Options:
-  - MCP server (preferred): Register as `mcp__perplexity__search` and `mcp__perplexity__research` tools
-  - Bash script: `~/.claude/scripts/perplexity_search.py` called via Bash tool
-  - Direct curl: Inline curl calls (works but verbose)
-- [ ] **Credential handling:** Load `PERPLEXITY_API_KEY` from `~/.config/secrets.env` or environment
-- [ ] **Model routing logic:** Default `sonar-pro` for all queries; `sonar-deep-research` only when user prefixes with "deep dive" or "thorough"
-- [ ] **Citation extraction:** Parse `[N]` markers from response content, map to `citations[]` URLs, format for Sources section
-- [ ] **Fallback chain:** Perplexity → WebSearch → Context7 (graceful degradation if API key missing or quota exceeded)
-- [ ] **Add to allowed-tools:** Update skill frontmatter to include the Perplexity tool once implemented
-- [ ] **Rate limit handling:** Catch 429 responses, fall back to WebSearch
+Returns `{results: [{title, url, snippet, date, last_updated}]}`. $5/1K requests flat.
 
 ## Output Rules
+
 - Default report length: under 1500 characters
-- If the user prefixed with "deep dive" or "thorough": up to 4000 characters
+- If the user prefixed with "deep dive" or "thorough": up to 4000 characters, use `sonar-deep-research`
 - Always include Sources section with clickable URLs
+- Always include Project Alignment section (connects findings to codebase)
 - Always include Recommendations section
+- Always include Research Stats line at the end
