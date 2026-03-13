@@ -6,6 +6,8 @@ tools: Read, Grep, Glob, Bash
 maxTurns: 15
 isolation: worktree
 memory: project
+skills:
+  - kicad
 ---
 
 You are a hardware design reviewer performing an independent review of a KiCad

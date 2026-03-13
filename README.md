@@ -25,6 +25,7 @@ my-claude-setup/
         notify-done.sh         # Audio feedback on task completion
         notify-permission.sh   # Toast + beep on permission prompts
         session-context.sh     # Inject git/sprint context on session resume
+        log-hook-event.sh      # JSONL event logging for session analysis
       project-stencil/         # Project hook templates (customize per project)
         commit-test-gate.sh    # Block commits unless tests passed recently
         commit-docs-gate.sh    # Warn if code staged without TASKS/CHANGELOG
@@ -38,6 +39,10 @@ my-claude-setup/
       bom-auditor.md           # BOM completeness & sourcing risk audit
       deployment-validator.md  # Pre-deploy safety checklist
       sprint-planner.md        # Velocity-based sprint planning
+    rules/                     # Glob-scoped rules (file-type-specific)
+      python.md                # Python conventions (scoped to **/*.py)
+      kicad.md                 # KiCad file rules (scoped to **/*.kicad_*)
+      shell-scripts.md         # Shell script rules (scoped to **/*.sh)
     scripts/
       perplexity_search.py     # Perplexity Sonar API wrapper (stdlib only)
   skills/                      # Hardware design skills (9 skills, 20 scripts)
@@ -77,6 +82,9 @@ cp my-claude-setup/claude-config/hooks/global/* ~/.claude/hooks/
 # Agent profiles
 cp my-claude-setup/claude-config/agents/* ~/.claude/agents/
 
+# Glob-scoped rules (file-type-specific)
+cp -r my-claude-setup/claude-config/rules/* ~/.claude/rules/
+
 # Perplexity wrapper script
 mkdir -p ~/.claude/scripts
 cp my-claude-setup/claude-config/scripts/perplexity_search.py ~/.claude/scripts/
@@ -88,6 +96,11 @@ Hooks need to be wired up in your global settings. Add the `hooks` block:
 
 ```json
 {
+  "attribution": "",
+  "cleanupPeriodDays": 30,
+  "env": {
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "80"
+  },
   "hooks": {
     "PreToolUse": [
       {
@@ -109,12 +122,22 @@ Hooks need to be wired up in your global settings. Add the `hooks` block:
     "SessionStart": [
       {
         "matcher": "resume|compact|clear",
-        "hooks": [{"type": "command", "command": "bash ~/.claude/hooks/session-context.sh"}]
+        "hooks": [{"type": "command", "command": "bash ~/.claude/hooks/session-context.sh", "once": true}]
       }
     ],
     "Stop": [
       {
         "hooks": [{"type": "command", "command": "bash ~/.claude/hooks/notify-done.sh"}]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [{"type": "command", "command": "bash ~/.claude/hooks/log-hook-event.sh", "async": true}]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [{"type": "command", "command": "bash ~/.claude/hooks/log-hook-event.sh", "once": true}]
       }
     ]
   }

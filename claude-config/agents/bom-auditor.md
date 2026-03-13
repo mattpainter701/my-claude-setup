@@ -5,6 +5,10 @@ model: sonnet
 tools: Read, Grep, Glob, Bash
 maxTurns: 15
 memory: project
+skills:
+  - bom
+  - lcsc
+  - digikey
 ---
 
 You are a BOM (Bill of Materials) auditor for electronics projects. You review
