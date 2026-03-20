@@ -16,75 +16,97 @@ allowed-tools:
 
 # Memory Sync Skill
 
-You are syncing session learnings to persistent memory. This runs in a forked context to avoid bloating the main conversation.
+You are syncing session learnings to persistent files that the built-in auto-memory system **cannot** update: CLAUDE.md files, skill files, and project-local `memory/MEMORY.md`. This runs in a forked context to avoid bloating the main conversation.
+
+## Scope — What This Skill Owns vs Auto-Memory
+
+| Target | Owner | Examples |
+|-|-|-|
+| `~/.claude/projects/*/memory/*.md` | **Auto-memory** (built-in) | User prefs, feedback, project context, references |
+| `~/.claude/CLAUDE.md` | **This skill** | Global workflow rules, tool prefs |
+| `.claude/CLAUDE.md` | **This skill** | Project-specific safety rules, conventions |
+| `memory/MEMORY.md` (project-local) | **This skill** | Connection methods, architecture, sprint state |
+| `~/.claude/skills/*/SKILL.md` | **This skill** | Pitfalls, patterns, dimensions, changelog |
+
+**Do NOT save here** (auto-memory handles these):
+- User role, preferences, or knowledge level → auto-memory `user` type
+- Feedback on Claude's approach ("don't do X", "yes, keep doing that") → auto-memory `feedback` type
+- Pointers to external systems (Linear projects, Grafana boards) → auto-memory `reference` type
+- One-off project context that doesn't affect file conventions → auto-memory `project` type
 
 ## When to Trigger
 
-Auto-invoke this skill when ANY of these occur during a session:
+Auto-invoke when ANY of these occur during a session:
 - A new SSH host, API endpoint, device address, or connection method was used
-- A workflow rule was established or corrected by the user
-- A recurring mistake was made that suggests a missing rule
-- A project convention was discovered that isn't documented
-- The user explicitly said "remember this" or "always do X"
+- A workflow rule was established that should be enforced via CLAUDE.md (not just remembered)
+- A project convention was discovered that isn't documented in CLAUDE.md
 - A sprint was opened or closed (version state changed)
-- A significant debugging session revealed non-obvious gotchas
+- A skill was used and a pitfall, correction, or new pattern was confirmed
+- A significant debugging session revealed non-obvious gotchas worth codifying
 
-## What to Update
+**Do NOT trigger for:**
+- Code patterns, architecture, or file paths derivable from reading the codebase
+- Git history or who-changed-what (use `git log`/`git blame`)
+- Debugging solutions (the fix is in the code; the commit message has context)
+- Ephemeral task state or current conversation context
+- Anything the user said to "remember" that fits auto-memory types above
 
-### Project Memory (`memory/MEMORY.md`)
-- **Current State:** version, sprint status, test counts
-- **Connection methods:** host, port, user, auth, gotchas
-- **Architecture patterns:** new modules, data flows, integration points
-- **Test patterns:** new fixture patterns, failure modes, workarounds
-- **Sprint summaries:** what was done, key decisions
-- **Gotchas:** non-obvious issues that wasted time
+## What to Update (priority order)
 
-### Global CLAUDE.md (`~/.claude/CLAUDE.md`)
-- Only add rules that genuinely apply across ALL projects
-- Workflow corrections the user gave (e.g., "never do X")
-- Tool preferences (e.g., "always use py not python")
+### 1. Skill Files (`~/.claude/skills/*/SKILL.md` or `.claude/skills/*/SKILL.md`)
 
-### Project CLAUDE.md (`.claude/CLAUDE.md`)
-- New safety rules or conventions specific to this project
-- Proactive behavior additions (e.g., "before doing X, always check Y")
+Highest value — skills compound. Only update skills that were actually used in the session AND any of these occurred:
 
-### Skill Files (`~/.claude/skills/*/SKILL.md` or `.claude/skills/*/SKILL.md`)
-Skills are living documents. When a skill was used in the session AND any of these occurred, update the skill file directly:
-
-**Triggers for skill updates:**
-- A pitfall/gotcha was discovered during skill use (e.g., "OLED shelf creates split-body in slicer")
-- A pattern or technique worked well and should be reusable (e.g., a new enclosure pattern)
+- A pitfall/gotcha was discovered (e.g., "OLED shelf creates split-body in slicer")
+- A pattern or technique worked well and should be reusable
 - The user corrected the skill's output (wrong default, missing step, bad assumption)
-- A new tool integration was discovered (e.g., "Bambu Studio auto-splits disconnected bodies")
-- Component dimensions were verified against real hardware (update dimension tables)
+- A new tool integration was discovered
+- Component dimensions were verified against real hardware
 - A workflow step was missing or in the wrong order
 
-**Where to add in the skill file:**
-- **Pitfalls/gotchas** → add to a `## Pitfalls` or `## Common Pitfalls` section
-- **New patterns** → add to the relevant patterns section
-- **Corrections** → fix the wrong content in-place
-- **New dimensions/specs** → update reference tables
-- **Workflow changes** → update the workflow/process section
-- **Session learning** → append to `## Changelog` at bottom of skill file
+**Where to add:**
+- **Pitfalls/gotchas** → `## Pitfalls` or `## Common Pitfalls` section
+- **New patterns** → relevant patterns section
+- **Corrections** → fix wrong content in-place
+- **New dimensions/specs** → reference tables
+- **Workflow changes** → process section
+- **Session learning** → `## Changelog` at bottom
 
-**Format for changelog entries:**
+**Changelog format:**
 ```markdown
 ## Changelog
 - 2026-03-12: Added split-body pitfall for slicer import (OLED shelf was disconnected geometry)
-- 2026-03-12: Increased antenna hole to 12mm for rubber duck pass-through
 ```
 
 **Rules:**
-- Only update skills that were actually used in the session
-- Only add verified learnings (things that were tested and confirmed)
+- Only add verified learnings (tested and confirmed)
 - Keep entries concise — one line per learning
 - Don't duplicate content already in the skill body (move it to the right section instead)
+
+### 2. CLAUDE.md Files
+
+**Global (`~/.claude/CLAUDE.md`)** — only rules that apply across ALL projects:
+- Workflow corrections the user gave (e.g., "never do X")
+- Tool preferences (e.g., "always use py not python")
+
+**Project (`.claude/CLAUDE.md`)** — project-specific:
+- Safety rules or conventions specific to this project
+- Proactive behavior rules (e.g., "before doing X, always check Y")
+
+### 3. Project Memory (`memory/MEMORY.md`)
+
+Lowest priority — only for structured project state that doesn't fit CLAUDE.md:
+- **Connection methods:** host, port, user, auth, gotchas
+- **Current state:** version, sprint status
+- **Architecture patterns:** new modules, data flows, integration points
+- **Gotchas:** non-obvious issues that wasted debugging time
 
 ## Rules
 
 1. **Read before writing.** Always read the target file first to avoid duplicates.
 2. **Merge, don't append.** Update existing sections rather than adding new ones when the topic already exists.
 3. **Keep MEMORY.md under 200 lines.** It's loaded into every conversation context. Be ruthless about conciseness.
-4. **Never store secrets.** No API keys, passwords, or tokens in memory files. Store the pattern (e.g., "uses env var FREESOUND_API_KEY") not the value.
-5. **Verify before writing.** Don't write speculative or unverified information. If you saw it work, write it. If you read it in one file, cross-check first.
+4. **Never store secrets.** No API keys, passwords, or tokens. Store the pattern (e.g., "uses env var FREESOUND_API_KEY") not the value.
+5. **Verify before writing.** Don't write speculative or unverified information. If you saw it work, write it.
 6. **Delete stale info.** If you notice outdated entries (old versions, removed files, changed patterns), remove them.
+7. **Check auto-memory first.** If the learning fits a `user`, `feedback`, `project`, or `reference` memory type, let auto-memory handle it. Only use this skill for CLAUDE.md, skill files, and project-local MEMORY.md.
