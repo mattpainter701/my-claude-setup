@@ -37,6 +37,7 @@
 - **Catchup:** @~/.claude/skills/catchup/SKILL.md — restore context after /clear
 - **Review:** @~/.claude/skills/review/SKILL.md — fresh-context code review (writer/reviewer pattern)
 - **Session mine:** @~/.claude/skills/session_mine/SKILL.md — analyze session logs for patterns
+- **Verify:** @~/.claude/skills/verify/SKILL.md — pre-commit/pre-PR quality gate
 - **KiCad:** @~/.claude/skills/kicad/SKILL.md — analyze schematics, PCB layouts, Gerbers, design review
 - **BOM:** @~/.claude/skills/bom/SKILL.md — BOM lifecycle, sourcing, pricing, per-supplier order files
 - **DigiKey:** @~/.claude/skills/digikey/SKILL.md — component search + datasheet downloads
@@ -65,6 +66,7 @@ current sprint/task numbers, the specific bug or feature being worked on.
 - **bom-auditor:** @~/.claude/agents/bom-auditor.md — BOM completeness & sourcing audit (project memory)
 - **deployment-validator:** @~/.claude/agents/deployment-validator.md — pre-deploy safety checklist (project memory)
 - **sprint-planner:** @~/.claude/agents/sprint-planner.md — velocity-based sprint planning (project memory)
+- **security-reviewer:** @~/.claude/agents/security-reviewer.md — OWASP/secrets/injection audit (proactive on auth/API code)
 
 ## Tools
 - **jq:** Installed via winget. Used by hook scripts for JSON parsing.
