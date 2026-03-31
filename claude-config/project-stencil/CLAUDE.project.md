@@ -18,6 +18,13 @@
 - For hardware mocks, preserve connection guards and metadata exactly.
 -->
 
+## Rule Layering
+
+- Keep the highest-signal shared project rules in this file.
+- Use `.claude/rules/*.md` for topic-specific checked-in rules such as testing, deploys, hardware, or release flow.
+- Use `CLAUDE.local.md` for private machine-specific notes that should not be committed.
+- If a rule block becomes long or reusable, move it into a rule file and `@include` it instead of bloating this file.
+
 ## Skills
 
 <!-- List project-specific skills here. Format: -->
@@ -37,6 +44,11 @@
 - **Docs gate** (PreToolUse → Bash): Warns if code files are staged but TASKS.md or CHANGELOG.md are not. Soft warning, not hard block.
 - **Test marker** (PostToolUse → Bash): Auto-creates test marker after successful pytest. Parses pytest summary line to avoid false negatives from test names containing "failed".
 - **Compaction context** (PreCompact): Injects version, recent commits, and current sprint into compaction summaries.
+
+Claude Code also supports richer hook definitions when deterministic shell hooks are not enough:
+- `if`, `shell`, `timeout`, `statusMessage`, `async`, `asyncRewake`
+- `prompt`, `http`, and `agent` hook types
+- For high-risk paths such as auth, deploys, migrations, or hook/skill/agent edits, prefer a narrow `agent` `PostToolUse` verifier hook over a noisy broad always-on review loop.
 
 ## Proactive Behaviors
 

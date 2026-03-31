@@ -38,6 +38,9 @@
 - **Review:** @~/.claude/skills/review/SKILL.md — fresh-context code review (writer/reviewer pattern)
 - **Session mine:** @~/.claude/skills/session_mine/SKILL.md — analyze session logs for patterns
 - **Verify:** @~/.claude/skills/verify/SKILL.md — pre-commit/pre-PR quality gate
+- **Doctor:** @~/.claude/skills/doctor/SKILL.md — audit ~/.claude and project wiring
+- **Bootstrap:** @~/.claude/skills/bootstrap/SKILL.md — scaffold or refresh global/project/MCP/statusline setup
+- **Verifier hooks:** @~/.claude/skills/verifier_hooks/SKILL.md — arm a one-shot post-edit verifier hook
 - **KiCad:** @~/.claude/skills/kicad/SKILL.md — analyze schematics, PCB layouts, Gerbers, design review
 - **BOM:** @~/.claude/skills/bom/SKILL.md — BOM lifecycle, sourcing, pricing, per-supplier order files
 - **DigiKey:** @~/.claude/skills/digikey/SKILL.md — component search + datasheet downloads
@@ -46,6 +49,7 @@
 - **JLCPCB:** @~/.claude/skills/jlcpcb/SKILL.md — PCB fab & assembly ordering
 - **PCBWay:** @~/.claude/skills/pcbway/SKILL.md — alternative PCB fab & assembly
 - **OpenSCAD:** @~/.claude/skills/openscad/SKILL.md — parametric 3D models, enclosures, print-ready STL/3MF
+- **Path-scoped authoring skills:** `hook_authoring`, `skill_authoring`, and `agent_authoring` auto-load on matching files so hooks, skills, and agents stay internally consistent while you edit them.
 
 ## Session Hygiene
 - `/clear` between unrelated tasks. Context pollution causes drift.
@@ -94,5 +98,7 @@ When you notice any of these during a session, update the relevant CLAUDE.md or 
 - The user says "remember this" or "always do X"
 
 For project CLAUDE.md changes: edit in-place, keep it concise, don't bloat.
+If the project needs more structure, split topic-specific instructions into `.claude/rules/*.md` and keep the top-level file short.
+Use `CLAUDE.local.md` for private machine-specific notes that should not be committed.
 For global CLAUDE.md changes: only add rules that genuinely apply across all projects.
 For memory files: prefer updating existing entries over creating new ones.
