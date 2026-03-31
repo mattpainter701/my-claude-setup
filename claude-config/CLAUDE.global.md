@@ -30,6 +30,8 @@
 - NEVER use box-drawing characters (`┌ ┬ ─ │ └ ┘ ├ ┤ ┼`). Banned everywhere.
 
 ## Skills
+
+### Workflow (Core)
 - **Commit:** @~/.claude/skills/commit/SKILL.md — task-aware commits, conventional format
 - **Sprint:** @~/.claude/skills/sprint/SKILL.md — sprint open/close lifecycle (manual only)
 - **Research:** @~/.claude/skills/research/SKILL.md — deep research with structured reports
@@ -41,15 +43,46 @@
 - **Doctor:** @~/.claude/skills/doctor/SKILL.md — audit ~/.claude and project wiring
 - **Bootstrap:** @~/.claude/skills/bootstrap/SKILL.md — scaffold or refresh global/project/MCP/statusline setup
 - **Verifier hooks:** @~/.claude/skills/verifier_hooks/SKILL.md — arm a one-shot post-edit verifier hook
+
+### Hardware Design & Sourcing
 - **KiCad:** @~/.claude/skills/kicad/SKILL.md — analyze schematics, PCB layouts, Gerbers, design review
 - **BOM:** @~/.claude/skills/bom/SKILL.md — BOM lifecycle, sourcing, pricing, per-supplier order files
-- **DigiKey:** @~/.claude/skills/digikey/SKILL.md — component search + datasheet downloads
+- **EE:** @~/.claude/skills/ee/SKILL.md — circuit analysis, power supply design, signal integrity, RF, thermal, EMC
+- **DigiKey:** @~/.claude/skills/digikey/SKILL.md — component search + datasheet downloads (primary prototype source)
 - **Mouser:** @~/.claude/skills/mouser/SKILL.md — secondary prototype sourcing
+- **Element14:** @~/.claude/skills/element14/SKILL.md — Newark/Farnell/element14 component sourcing
 - **LCSC:** @~/.claude/skills/lcsc/SKILL.md — production sourcing (JLCPCB parts library)
 - **JLCPCB:** @~/.claude/skills/jlcpcb/SKILL.md — PCB fab & assembly ordering
-- **PCBWay:** @~/.claude/skills/pcbway/SKILL.md — alternative PCB fab & assembly
+- **PCBWay:** @~/.claude/skills/pcbway/SKILL.md — alternative PCB fab & assembly (turnkey sourcing)
 - **OpenSCAD:** @~/.claude/skills/openscad/SKILL.md — parametric 3D models, enclosures, print-ready STL/3MF
-- **Path-scoped authoring skills:** `hook_authoring`, `skill_authoring`, and `agent_authoring` auto-load on matching files so hooks, skills, and agents stay internally consistent while you edit them.
+
+### Auto/Hidden (Path-Scoped, Auto-Loaded)
+- **skill_authoring:** Auto-loaded when editing `claude-config/skills/*/SKILL.md` — guidance for consistent skill metadata, documentation, and tooling
+- **hook_authoring:** Auto-loaded when editing `claude-config/hooks/**` — guidance for hook scripts, matchers, blocking behavior
+- **agent_authoring:** Auto-loaded when editing `claude-config/agents/**` — guidance for agent permissions, isolation, memory scope
+- **memory-extraction:** Auto-loaded at session end — extracts durable learnings (decisions, preferences, connections) into project memory
+
+### Repository Organization
+The **repo** uses an organized structure:
+```
+claude-config/skills/
+  workflow/          (commit, sprint, research, etc.)
+  hardware/          (kicad, bom, digikey, mouser, etc.)
+  auto/              (path-scoped authoring helpers)
+```
+
+The **`/bootstrap global`** command flattens this into `~/.claude/skills/` for local use:
+```
+~/.claude/skills/
+  commit/
+  sprint/
+  kicad/
+  bom/
+  ee/
+  (all together, no subdir organization)
+```
+
+This allows the repo to stay organized for development while keeping `~/.claude` flat for direct skill references.
 
 ## Session Hygiene
 - `/clear` between unrelated tasks. Context pollution causes drift.
@@ -71,6 +104,7 @@ current sprint/task numbers, the specific bug or feature being worked on.
 - **deployment-validator:** @~/.claude/agents/deployment-validator.md — pre-deploy safety checklist (project memory)
 - **sprint-planner:** @~/.claude/agents/sprint-planner.md — velocity-based sprint planning (project memory)
 - **security-reviewer:** @~/.claude/agents/security-reviewer.md — OWASP/secrets/injection audit (proactive on auth/API code)
+- **memory-extractor:** @~/.claude/agents/memory-extractor.md — auto-extracts durable learnings (decisions, corrections, preferences, connection methods) at session end
 
 ## Tools
 - **jq:** Installed via winget. Used by hook scripts for JSON parsing.
