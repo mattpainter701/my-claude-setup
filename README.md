@@ -1,6 +1,149 @@
 # my-claude-setup
 
-A complete Claude Code configuration — global rules, workflow skills, hardware design skills, hook scripts, agent profiles, and project stencils. Everything needed to set up a productive Claude Code environment from scratch.
+A production-grade Claude Code configuration with 25 skills, 9 specialized agents, automated memory extraction, and comprehensive hook system. Everything you need to set up a bulletproof local development environment.
+
+```
+  ╔════════════════════════════════════════════════════════════════════╗
+  ║                                                                    ║
+  ║   Claude Code Configuration • 25 Skills • 9 Agents • Auto-Memory  ║
+  ║                                                                    ║
+  ║   Workflow  |  Hardware  |  Auto-Invoke  |  Agents  |  Hooks     ║
+  ║   ========     =========     ============     =======     =====   ║
+  ║     11          10              4              9           15    ║
+  ║                                                                    ║
+  ╚════════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## Skill Landscape
+
+```
+                              ┌─────────────────────────────────────┐
+                              │      Global Configuration          │
+                              │    (CLAUDE.global.md)              │
+                              └────────────────┬────────────────────┘
+                                               │
+                 ┌─────────────────────────────┼─────────────────────────────┐
+                 │                             │                             │
+        ┌────────▼──────────┐       ┌──────────▼──────────┐       ┌─────────▼──────────┐
+        │    WORKFLOW       │       │    HARDWARE        │       │   AUTO-INVOKE      │
+        │   (11 Skills)     │       │  (10 Skills)       │       │  (4 Skills)        │
+        ├──────────────────┤       ├────────────────────┤       ├────────────────────┤
+        │ • commit         │       │ • kicad            │       │ • skill_authoring  │
+        │ • review         │       │ • bom              │       │ • hook_authoring   │
+        │ • research       │       │ • digikey          │       │ • agent_authoring  │
+        │ • sprint         │       │ • mouser           │       │ • memory-extract   │
+        │ • verify         │       │ • lcsc             │       │                    │
+        │ • catchup        │       │ • element14        │       │ [path-scoped]      │
+        │ • memory_sync    │       │ • jlcpcb           │       │ [auto-triggered]   │
+        │ • session_mine   │       │ • pcbway           │       │                    │
+        │ • doctor         │       │ • openscad         │       │                    │
+        │ • bootstrap      │       │ • ee               │       │                    │
+        │ • verifier_hooks │       │ • (4 analysis      │       │                    │
+        │                  │       │    scripts)        │       │                    │
+        └──────────────────┘       └────────────────────┘       └────────────────────┘
+```
+
+---
+
+## Data Flow: From Repo to Your Machine
+
+```
+  my-claude-setup/
+        │
+        ├─ claude-config/    (organized, hierarchical)
+        │   ├─ skills/
+        │   │   ├─ workflow/  ──┐
+        │   │   ├─ hardware/  ──┼─ bootstrap_global.sh ──→ ~/.claude/skills/
+        │   │   └─ auto/      ──┘    (flattened, flat)
+        │   ├─ agents/         ──────────────────────────→ ~/.claude/agents/
+        │   ├─ hooks/          ──────────────────────────→ ~/.claude/hooks/
+        │   └─ rules/          ──────────────────────────→ ~/.claude/rules/
+        │
+        └─ kilo.json          ──────────────────────────→ ~/.config/kilo/
+                                                          or ~/.claude/
+```
+
+---
+
+## Agent Architecture
+
+```
+  Your Session
+        │
+        ├─ code-reviewer ─────────────┐
+        │                              │
+        ├─ hardware-reviewer ──────────┤ Isolated Worktree
+        │                              │ (Fresh Eyes)
+        ├─ security-reviewer ──────────┤
+        │                              │
+        ├─ research-analyst ───────────┤
+        │                              │
+        ├─ bom-auditor ────────────────┤
+        │                              │
+        ├─ deployment-validator ───────┤
+        │                              │
+        ├─ sprint-planner ─────────────┤
+        │                              │
+        ├─ session-analyst ────────────┤
+        │                              │
+        └─ memory-extractor ───────────┘ (background auto-invoke)
+```
+
+---
+
+## Memory Extraction System
+
+```
+  Session Context (JSONL)
+           │
+           ▼
+  memory-auto-extract.sh  ◄─── fires at session end
+           │
+           ▼
+  memory_extract.py       ◄─── pattern matching
+           │
+      ┌────┼────┬─────┬────────┐
+      │    │    │     │        │
+      ▼    ▼    ▼     ▼        ▼
+   decisions  lessons  preferences  connections  tools
+   ────────  ────────  ───────────  ───────────  ─────
+   • choices • fixes   • workflows  • hosts      • cli
+   • archs   • gotchas • prefs      • ports      • libs
+   • lib     • errors  • patterns   • endpoints  • found
+   • stack              • habits
+
+        ┌──────────────────────────────┐
+        │    memory/MEMORY.md          │
+        │  (maintained, indexed, live) │
+        └──────────────────────────────┘
+```
+
+---
+
+## Hook Execution Timeline
+
+```
+  Session Start
+      │
+      ├─ SessionStart ─────┬─ session-context.sh ────→ inject git state
+      │                    └─ skill-discovery.sh ────→ report skills count
+      │
+      ├─ PreToolUse ───────┬─ block-coauthored.sh ───→ enforce conventions
+      │  (before Bash)      └─ [project hooks]
+      │
+      ├─ PostToolUse ──────┬─ auto-lint.sh ──────────→ ruff format/check
+      │  (after Edit/Write) └─ [project hooks]
+      │
+      ├─ Notification ─────┬─ notify-permission.sh ──→ beep + toast
+      │  (perm requests)    └─
+      │
+      └─ SessionEnd ───────┬─ memory-auto-extract.sh→ extract memories
+                           └─ log-hook-event.sh ────→ JSONL log
+```
+
+---
 
 ## What's In Here
 
@@ -84,6 +227,28 @@ my-claude-setup/
     preferences.md             # Workflow preferences
     tools.md                   # Discovered tools and utilities
 ```
+
+## Quick Start
+
+```bash
+# 1. Clone
+git clone https://github.com/mattpainter701/my-claude-setup.git
+cd my-claude-setup
+
+# 2. Bootstrap (one command, flattens and installs everything)
+bash bootstrap_global.sh
+
+# 3. Verify
+claude /doctor --full
+
+# 4. Start using
+/commit         # Task-aware commits
+/review         # Code review
+/research       # Deep research
+/sprint open    # Sprint planning
+```
+
+---
 
 ## Setup Guide
 
@@ -333,6 +498,30 @@ Project-agnostic rules that apply everywhere:
 
 ### Workflow Skills (global)
 
+```
+  ┌──────────────────────────────────────────────────────────────────┐
+  │                    11 WORKFLOW SKILLS                            │
+  ├──────────────────────────────────────────────────────────────────┤
+  │                                                                   │
+  │ • /commit ─────────→ Task-aware conventional commits             │
+  │ • /review ─────────→ Fresh-context code review (agent)           │
+  │ • /research ───────→ Perplexity + codebase analysis              │
+  │ • /sprint ─────────→ Sprint open/close + velocity tracking       │
+  │ • /verify ─────────→ Pre-commit quality gate                     │
+  │ • /catchup ────────→ Restore context after /clear                │
+  │ • /session_mine ───→ Analyze session logs for patterns           │
+  │ • /memory_sync ────→ Extract durable memories                    │
+  │ • /doctor ─────────→ Validate setup health                       │
+  │ • /bootstrap ──────→ Install/refresh global or project config    │
+  │ • /verifier_hooks ─→ Arm post-edit agent verifier                │
+  │                                                                   │
+  │ + 4 Hidden Auto-Skills (trigger on file type)                    │
+  │   → skill_authoring, hook_authoring, agent_authoring,            │
+  │     memory-extraction                                            │
+  │                                                                   │
+  └──────────────────────────────────────────────────────────────────┘
+```
+
 | Skill | Trigger | What It Does |
 |-|-|-|
 | `/commit` | After code changes | Inspects diff, checks TASKS/CHANGELOG, conventional commit |
@@ -345,15 +534,48 @@ Project-agnostic rules that apply everywhere:
 | `/bootstrap [global\|project\|mcp\|statusline]` | Setup / refresh | Installs or refreshes global/project stencils, MCP wiring, and statusline setup |
 | `/verifier_hooks` | Risky next edit | Arms a one-shot post-edit agent verifier for the next `Edit` or `Write` |
 
-The `memory_sync` skill auto-invokes when session learnings should be persisted.
-
-Path-scoped authoring skills also auto-activate on matching files:
-
-- `hook_authoring` for `claude-config/hooks/**`, `.claude/hooks/**`, and hook settings files
-- `skill_authoring` for skill folders such as `claude-config/skills/**` and `.claude/skills/**`
-- `agent_authoring` for `claude-config/agents/**` and `.claude/agents/**`
-
 ### Hardware Skills
+
+```
+  ┌─────────────────────────────────────────────────────────────────┐
+  │               10 HARDWARE DESIGN & SOURCING SKILLS              │
+  ├─────────────────────────────────────────────────────────────────┤
+  │                                                                  │
+  │  Analysis & Design                                              │
+  │  ═══════════════════════════════════════════════════════════    │
+  │    • kicad ───────→ Schematic + PCB + Gerber analysis           │
+  │    • openscad ────→ Parametric 3D modeling (STL/3MF export)     │
+  │    • ee ──────────→ Circuit design reference (RF, power, EMC)   │
+  │                                                                  │
+  │  Component Sourcing (API + Datasheet Sync)                      │
+  │  ════════════════════════════════════════════════════════════   │
+  │    • digikey ─────→ Primary prototype source + direct PDFs      │
+  │    • mouser ──────→ Secondary prototype source                  │
+  │    • lcsc ────────→ Production sourcing (JLCPCB library)        │
+  │    • element14 ───→ International sourcing (Newark/Farnell)     │
+  │                                                                  │
+  │  BOM & Manufacturing                                            │
+  │  ═══════════════════════════════════════════════════════════    │
+  │    • bom ─────────→ Full BOM lifecycle (extract→validate→order) │
+  │    • jlcpcb ──────→ PCB fabrication & assembly (LCSC parts)     │
+  │    • pcbway ──────→ Alternative fab (turnkey by MPN)            │
+  │                                                                  │
+  └─────────────────────────────────────────────────────────────────┘
+
+  Component Search Pipeline:
+  ─────────────────────────
+    KiCad Schematic (MPN)
+        ↓
+    [digikey | mouser | lcsc | element14] API
+        ↓
+    Match validation (package, specs, lifecycle)
+        ↓
+    Datasheet sync (PDF to datasheets/ directory)
+        ↓
+    BOM export (CSV for distributors or JLCPCB/PCBWay)
+        ↓
+    Order files (per-distributor, with price breaks)
+```
 
 | Skill | Purpose | Scripts |
 |-|-|-|
@@ -366,6 +588,7 @@ Path-scoped authoring skills also auto-activate on matching files:
 | **jlcpcb** | PCB fab + assembly — design rules, BOM format, ordering | Instruction-only |
 | **pcbway** | Alternative PCB fab — turnkey assembly by MPN | Instruction-only |
 | **openscad** | Parametric 3D models — enclosures, mounts, brackets | Instruction-only |
+| **ee** | Electrical engineering reference (circuits, power, RF, thermal) | Instruction-only |
 
 ### Hook Scripts
 
@@ -425,17 +648,49 @@ This repo now includes two verifier-hook patterns:
 
 ### Agent Profiles
 
-| Agent | Use Case |
-|-|-|
-| `code-reviewer` | Fresh-context code review (writer/reviewer pattern) |
-| `session-analyst` | Session log analysis for usage patterns |
-| `hardware-reviewer` | Independent KiCad schematic + PCB design review |
-| `research-analyst` | MCP-aware structured technical research |
-| `bom-auditor` | BOM completeness, sourcing risk, cost optimization |
-| `deployment-validator` | Pre-deploy safety checklist (secrets, deps, embedded constraints) |
-| `sprint-planner` | Velocity-based sprint planning from task history |
-| `security-reviewer` | Focused security audit with docs-aware framework/library checking |
-| `memory-extractor` | Auto-extracts durable memories from session context |
+```
+  ┌──────────────────────────────────────────────────────────────────┐
+  │            9 SPECIALIZED AGENTS (Worktree-Isolated)              │
+  ├──────────────────────────────────────────────────────────────────┤
+  │                                                                   │
+  │  Code Review                                                      │
+  │  ───────────                                                      │
+  │    code-reviewer ────→ Fresh eyes on logic, security, perf       │
+  │    security-reviewer → OWASP + injection + secrets audit         │
+  │                                                                   │
+  │  Hardware & Design                                                │
+  │  ─────────────────                                                │
+  │    hardware-reviewer → KiCad schematic + PCB pin mapping         │
+  │    bom-auditor ──────→ Component sourcing & cost optimization    │
+  │                                                                   │
+  │  Research & Analysis                                              │
+  │  ───────────────────                                              │
+  │    research-analyst ─→ Perplexity web + codebase cross-ref      │
+  │    session-analyst ──→ Log mining for patterns & inefficiencies │
+  │                                                                   │
+  │  Project Planning & Deploy                                        │
+  │  ───────────────────────────                                      │
+  │    sprint-planner ────→ Velocity-based task sizing + roadmap    │
+  │    deployment-validator→ Pre-deploy safety checklist            │
+  │                                                                   │
+  │  Memory Management                                                │
+  │  ────────────────                                                 │
+  │    memory-extractor ──→ Auto-invoke: extract durable learnings   │
+  │                                                                   │
+  └──────────────────────────────────────────────────────────────────┘
+```
+
+| Agent | Use Case | Mode |
+|-|-|-|
+| `code-reviewer` | Fresh-context code review (writer/reviewer pattern) | Worktree |
+| `session-analyst` | Session log analysis for usage patterns | Worktree |
+| `hardware-reviewer` | Independent KiCad schematic + PCB design review | Worktree |
+| `research-analyst` | MCP-aware structured technical research | Worktree |
+| `bom-auditor` | BOM completeness, sourcing risk, cost optimization | Worktree |
+| `deployment-validator` | Pre-deploy safety checklist (secrets, deps, embedded constraints) | Worktree |
+| `sprint-planner` | Velocity-based sprint planning from task history | Worktree |
+| `security-reviewer` | Focused security audit with docs-aware framework/library checking | Worktree |
+| `memory-extractor` | Auto-extracts durable memories from session context | Background |
 
 This repo now uses richer agent frontmatter in selected agents, including `mcpServers`, `initialPrompt`, `effort`, read-only tool scoping, and Kilo-compatible `permission` blocks. Claude Code also supports `permissionMode`, `hooks`, `skills`, `memory: local`, `background`, and `disallowedTools` when you need them.
 
@@ -561,29 +816,125 @@ your-project/
 
 ## Typical Workflows
 
-### Design Review
 ```
-"Review my KiCad project at hardware/myboard/"
+  ╔═════════════════════════════════════════════════════════════════╗
+  ║                      WORKFLOW PATTERNS                         ║
+  ╚═════════════════════════════════════════════════════════════════╝
 ```
-Claude runs schematic + PCB analyzers, syncs datasheets, cross-references pins against datasheets, produces a prioritized issue report.
 
-### BOM Management
+### 🔍 Design Review
 ```
-"Search DigiKey for all parts in my schematic, update the BOM"
-```
-Claude extracts components, searches distributor APIs, validates matches, writes part numbers back into KiCad properties, exports tracking CSV.
+User: "Review my KiCad project at hardware/myboard/"
 
-### Research
+  ┌─────────────────────────────────────┐
+  │ hardware-reviewer agent spawns      │
+  ├─────────────────────────────────────┤
+  │ ✓ Analyze schematic (pin-to-net)    │
+  │ ✓ Analyze PCB (routing, thermal)    │
+  │ ✓ Sync datasheets                   │
+  │ ✓ Cross-reference pins vs datasheet │
+  │ ✓ Check design rules (DFM)          │
+  └─────────────────────────────────────┘
+           ↓
+  CRITICAL → WARNINGS → SUGGESTIONS
+  (prioritized issue report)
+```
+
+### 🧬 BOM Management
+```
+User: "Search DigiKey for all parts in my schematic, update the BOM"
+
+  Schematic
+    ↓
+  Extract components (MPN, footprint, value)
+    ↓
+  [digikey | mouser | lcsc] API search
+    ↓
+  Validate matches (package, specs, lifecycle)
+    ↓
+  Sync datasheets (PDFs to datasheets/ dir)
+    ↓
+  Write properties back to schematic
+    ↓
+  Export BOM.csv (with stock, prices, chosen distributor)
+```
+
+### 🔬 Research
 ```
 /research TDOA direction finding for drone detection using SDR
-```
-Claude normalizes the query, runs Perplexity web search + codebase analysis in parallel, merges both datasets, produces a cited report with project alignment.
 
-### Enclosure Design
+  ┌──────────────────────────────────────────┐
+  │  Perplexity (web search, citations)     │  Parallel
+  │  + Claude (codebase grep, memory)       │  Search
+  ├──────────────────────────────────────────┤
+  │ Merge results + cross-references        │
+  ├──────────────────────────────────────────┤
+  │ ✓ Summary (lead with answer)             │
+  │ ✓ Key Findings (with [web] / [codebase] │
+  │   provenance markers)                    │
+  │ ✓ Sources (clickable URLs)               │
+  │ ✓ Project Alignment                      │
+  │ ✓ Recommendations                        │
+  └──────────────────────────────────────────┘
+  → Structured report (save to memory)
 ```
-"Design a snap-fit enclosure for my 60x40mm PCB with USB-C and 2 SMA ports"
+
+### 📦 Enclosure Design
 ```
-Claude generates parametric OpenSCAD with proper tolerances, screw bosses, port cutouts, FDM-friendly geometry. Renders to STL.
+User: "Design a snap-fit enclosure for my 60x40mm PCB with USB-C and 2 SMA ports"
+
+  ┌──────────────────────────────────────┐
+  │ Generate parametric OpenSCAD:        │
+  ├──────────────────────────────────────┤
+  │ • Hull-based rounded box             │
+  │ • Screw bosses (M3 heat-set inserts) │
+  │ • Port cutouts (USB: 10×4, SMA: 9mm)│
+  │ • Snap-fit lid (inset lip)           │
+  │ • FDM-friendly geometry              │
+  │ • 0.3mm wall thickness               │
+  │ • Parametric (tune sizes in code)    │
+  └──────────────────────────────────────┘
+        ↓
+  Render to STL (binary) or 3MF
+        ↓
+  Import to slicer (Bambu/Prusa)
+        ↓
+  Print on FDM 3D printer
+```
+
+### 🚀 Pre-Commit Quality Gate
+```
+/verify pre-commit
+
+  ┌──────────────────────────────────────┐
+  │ Python project auto-detection:       │
+  ├──────────────────────────────────────┤
+  │ [✓] Build/Import check               │
+  │ [✓] Type check (mypy)                │
+  │ [✓] Lint (ruff)                      │
+  │ [✓] Tests pass (pytest)              │
+  │ [✓] No secrets (API key grep)        │
+  │ [✓] No debug artifacts               │
+  │ [⚠] Security scan (agent)            │
+  └──────────────────────────────────────┘
+  → READY ✓  or  NOT READY ✗
+```
+
+### 📋 Sprint Planning
+```
+/sprint open
+
+  ┌──────────────────────────────────────┐
+  │ Analyze project state:               │
+  ├──────────────────────────────────────┤
+  │ • Last 3 sprints velocity            │
+  │ • P0/P1 tasks in backlog             │
+  │ • Technical debt risk                │
+  │ • Blocker analysis                   │
+  └──────────────────────────────────────┘
+        ↓
+  Propose N tasks matched to velocity
+  (with priority, complexity, dependencies)
 
 ## License
 
