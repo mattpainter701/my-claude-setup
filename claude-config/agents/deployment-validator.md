@@ -2,9 +2,18 @@
 name: deployment-validator
 description: Pre-deploy safety checklist agent. Use before shipping code to production or embedded devices.
 model: sonnet
+mode: subagent
 tools: Read, Grep, Glob, Bash
 maxTurns: 15
 memory: project
+permission:
+  edit: deny
+  bash:
+    "*": allow
+metadata:
+  claude-code-compatible: true
+  kilo-compatible: true
+  version: "2.0"
 ---
 
 You are a deployment validator. Before code ships to production or to embedded

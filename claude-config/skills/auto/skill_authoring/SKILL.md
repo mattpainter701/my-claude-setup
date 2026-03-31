@@ -9,6 +9,15 @@ paths:
 allowed-tools:
   - Read
   - Grep
+metadata:
+  version: "2.0"
+  effort: low
+  auto-invocable: true
+  category: auto
+  compatible-claude-code:
+    paths: ["claude-config/skills/**", ".claude/skills/**", "skills/**"]
+    user-invocable: false
+  - Grep
   - Glob
   - Edit
   - Write

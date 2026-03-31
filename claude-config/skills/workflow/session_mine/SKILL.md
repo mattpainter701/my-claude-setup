@@ -1,3 +1,18 @@
+---
+name: session_mine
+description: >
+  Analyze Claude Code session logs for patterns, inefficiencies, and improvement
+  opportunities. Parses JSONL session files to find hot files, error patterns, and skill gaps.
+metadata:
+  version: "2.0"
+  effort: medium
+  auto-invocable: false
+  category: workflow
+  compatible-claude-code:
+    when_to_use: "When analyzing session patterns or finding skill improvement opportunities"
+    allowed-tools: ["Agent", "Bash"]
+---
+
 # Session Mining Skill
 
 Usage: `/session_mine [days_back]`

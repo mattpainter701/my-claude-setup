@@ -1,6 +1,14 @@
 ---
 name: pcbway
 description: PCBWay PCB fabrication and assembly — turnkey/consigned assembly, design rules, ordering workflow. Alternative to JLCPCB for manufacturing. Use with KiCad. Use this skill when the user mentions PCBWay, needs turnkey assembly (PCBWay sources parts by MPN), has parts not available on LCSC, needs assembled boards with non-LCSC components, wants to compare PCBWay vs JLCPCB, or needs assembly with parts sourced globally rather than from LCSC only. For gerber/CPL export, stencil ordering, and BOM management, see the `bom` skill.
+metadata:
+  version: "2.0"
+  effort: medium
+  auto-invocable: false
+  category: hardware
+  compatible-claude-code:
+    when_to_use: "When ordering from PCBWay or comparing PCBWay vs JLCPCB"
+    allowed-tools: ["Bash", "Read", "Grep", "Glob"]
 ---
 
 # PCBWay — PCB Fabrication & Assembly

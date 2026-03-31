@@ -1,6 +1,14 @@
 ---
 name: mouser
 description: Search Mouser Electronics for electronic components — secondary source for prototype orders. Find parts, check pricing/stock, download datasheets, analyze specifications. Use with KiCad for BOM creation and part selection. Use this skill when the user specifically mentions Mouser, when DigiKey is out of stock or has worse pricing, when comparing prices across distributors, or when searching for parts that DigiKey doesn't carry. For package cross-reference tables and BOM workflow, see the `bom` skill.
+metadata:
+  version: "2.0"
+  effort: medium
+  auto-invocable: false
+  category: hardware
+  compatible-claude-code:
+    when_to_use: "When searching Mouser for components or when DigiKey is unavailable"
+    allowed-tools: ["Bash", "Read", "Grep", "Glob"]
 ---
 
 # Mouser Electronics Parts Search & Analysis

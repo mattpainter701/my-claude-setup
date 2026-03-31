@@ -2,9 +2,18 @@
 name: session-analyst
 description: Analyzes Claude Code session logs for patterns and improvement opportunities.
 model: sonnet
+mode: subagent
 tools: Read, Grep, Glob, Bash
 maxTurns: 15
 memory: user
+permission:
+  edit: deny
+  bash:
+    "*": allow
+metadata:
+  claude-code-compatible: true
+  kilo-compatible: true
+  version: "2.0"
 ---
 
 You analyze Claude Code session logs to find usage patterns, inefficiencies,

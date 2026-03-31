@@ -1,3 +1,18 @@
+---
+name: verify
+description: >
+  Run a quality gate on the current project — build, types, lint, tests, secrets,
+  debug artifacts. Auto-detects project type (Python, Node, Rust, Go, Embedded, KiCad).
+metadata:
+  version: "2.0"
+  effort: medium
+  auto-invocable: false
+  category: workflow
+  compatible-claude-code:
+    when_to_use: "Before committing or opening a PR"
+    allowed-tools: ["Bash", "Read", "Grep", "Glob"]
+---
+
 # Verify Skill
 
 Usage: `/verify [quick|full|pre-commit|pre-pr]`

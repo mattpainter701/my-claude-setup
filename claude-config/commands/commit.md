@@ -1,26 +1,8 @@
 ---
-name: commit
-description: >
-  Task-aware git commits. Enforces conventional commit format, no Co-Authored-By,
-  and ensures TASKS.md + CHANGELOG.md are updated when they exist.
-allowed-tools:
-  - Bash
-  - Read
-  - Edit
-  - Grep
-  - Glob
-metadata:
-  version: "2.0"
-  effort: low
-  auto-invocable: false
-  category: workflow
-  compatible-claude-code:
-    when_to_use: "After completing a task or feature"
-    allowed-tools: ["Bash", "Read", "Edit", "Grep", "Glob"]
-    paths: []
+description: Task-aware git commit with conventional format, TASKS.md/CHANGELOG.md enforcement
+agent: code
+subtask: true
 ---
-
-# Commit Skill
 
 You are creating a git commit. Follow these rules exactly.
 
@@ -54,11 +36,10 @@ Format: `type: description (Task NNN)`
 Types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `perf`, `ci`
 
 Rules:
-- **NEVER** add `Co-Authored-By` lines. Not for Claude, not for anyone.
+- **NEVER** add `Co-Authored-By` lines. Not for Kilo, not for anyone.
 - Imperative mood ("Add X", not "Added X" or "Adds X")
 - First line under 72 characters
 - Reference task numbers when applicable
-- For sprint-closing commits: `feat: Sprint NN Tasks XXX-YYY — description (vX.Y.Z)`
 - Use a HEREDOC for multi-line messages
 
 ## Step 5: Commit and Verify
@@ -73,10 +54,3 @@ EOF
 ```
 
 Run `git status` after to verify the commit succeeded.
-
-## If Pre-Commit Hook Fails
-
-- Read the error output
-- Fix the issue
-- Re-stage the fixed files
-- Create a NEW commit (never `--amend` after hook failure — the commit didn't happen)

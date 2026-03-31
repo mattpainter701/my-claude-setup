@@ -10,6 +10,16 @@ paths:
 allowed-tools:
   - Read
   - Grep
+metadata:
+  version: "2.0"
+  effort: low
+  auto-invocable: true
+  category: auto
+  compatible-claude-code:
+    paths: ["claude-config/hooks/**", ".claude/hooks/**", ".claude/settings.json", ".claude/settings.local.json"]
+    user-invocable: false
+  - Read
+  - Grep
   - Glob
   - Edit
   - Write

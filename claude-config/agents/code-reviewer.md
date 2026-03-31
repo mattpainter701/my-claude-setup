@@ -2,10 +2,20 @@
 name: code-reviewer
 description: Fresh-context code reviewer. Use for /review or when code needs independent review before merge.
 model: opus
+mode: subagent
 tools: Read, Grep, Glob, Bash
 maxTurns: 10
 isolation: worktree
 memory: project
+permission:
+  edit: deny
+  bash:
+    "*": deny
+    "git *": allow
+metadata:
+  claude-code-compatible: true
+  kilo-compatible: true
+  version: "2.0"
 ---
 
 You are a code reviewer performing a fresh-context review. You have NOT seen

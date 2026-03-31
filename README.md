@@ -66,14 +66,30 @@ my-claude-setup/
     scripts/
       perplexity_search.py     # Perplexity Sonar API wrapper (stdlib only)
       session_mine.py          # Session log mining for workflow analysis
-      claude_doctor.py         # Install/project wiring audit
+      memory_extract.py        # Auto memory extraction from session JSONL
+    commands/                  # Kilo/Claude Code slash commands
+      commit.md                # /commit workflow
+      sprint.md                # /sprint workflow
+      research.md              # /research workflow
+      review.md                # /review workflow
+      verify.md                # /verify workflow
+      catchup.md               # /catchup workflow
+      session-mine.md          # /session-mine workflow
+      memory-sync.md           # /memory-sync workflow
+  memory/                      # Auto-extracted durable memories
+    MEMORY.md                  # Topic index (auto-maintained)
+    connections.md             # Hosts, IPs, ports, endpoints
+    decisions.md               # Architecture choices
+    lessons.md                 # Corrections and gotchas
+    preferences.md             # Workflow preferences
+    tools.md                   # Discovered tools and utilities
 ```
 
 ## Setup Guide
 
-### 1. Global Configuration (`~/.claude/`)
+### 1. Global Configuration (`~/.claude/` or `~/.config/kilo/`)
 
-These files go in your Claude Code home directory and apply to **all projects**.
+These files work with both Claude Code and Kilo CLI.
 
 ```bash
 # Clone the repo
@@ -103,6 +119,9 @@ cp -r my-claude-setup/claude-config/rules/* ~/.claude/rules/
 # Helper scripts
 mkdir -p ~/.claude/scripts
 cp my-claude-setup/claude-config/scripts/*.py ~/.claude/scripts/
+
+# Kilo config (optional — for Kilo CLI users)
+cp my-claude-setup/kilo.json ~/.config/kilo/kilo.json
 ```
 
 ### 2. Register Hooks in `~/.claude/settings.json`
@@ -359,6 +378,9 @@ Path-scoped authoring skills also auto-activate on matching files:
 | `notify-done.sh` | Stop | Ascending chirp on success, descending tone on error |
 | `notify-permission.sh` | Notification | Windows toast + beep when permission needed |
 | `session-context.sh` | SessionStart | Injects version, branch, commits, sprint on resume/compact/clear |
+| `log-hook-event.sh` | SubagentStop/SessionEnd | JSONL event logging for session analysis |
+| `memory-auto-extract.sh` | Stop | Background memory extraction at session end |
+| `skill-discovery.sh` | SessionStart | Reports available skills count at session start |
 
 **Project hook stencils** (copy and customize):
 
@@ -413,8 +435,83 @@ This repo now includes two verifier-hook patterns:
 | `deployment-validator` | Pre-deploy safety checklist (secrets, deps, embedded constraints) |
 | `sprint-planner` | Velocity-based sprint planning from task history |
 | `security-reviewer` | Focused security audit with docs-aware framework/library checking |
+| `memory-extractor` | Auto-extracts durable memories from session context |
 
-This repo now uses richer agent frontmatter in selected agents, including `mcpServers`, `initialPrompt`, `effort`, and read-only tool scoping. Claude Code also supports `permissionMode`, `hooks`, `skills`, `memory: local`, `background`, and `disallowedTools` when you need them.
+This repo now uses richer agent frontmatter in selected agents, including `mcpServers`, `initialPrompt`, `effort`, read-only tool scoping, and Kilo-compatible `permission` blocks. Claude Code also supports `permissionMode`, `hooks`, `skills`, `memory: local`, `background`, and `disallowedTools` when you need them.
+
+## Kilo CLI Compatibility
+
+This setup is compatible with both Claude Code and Kilo CLI. A `kilo.json` file is included for Kilo-native features:
+
+```json
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "skills": {
+    "paths": ["./claude-config/skills/workflow", "./claude-config/skills/hardware", "./claude-config/skills/auto"]
+  },
+  "agent": {
+    "code-reviewer": { "mode": "subagent", "model": "anthropic/claude-opus-4-20250514" },
+    "memory-extractor": { "mode": "subagent", "hidden": true }
+  }
+}
+```
+
+Kilo also loads skills from `.claude/skills/` and `.kilo/skills/`, and supports custom subagents via `.kilo/agents/*.md` or `.claude/agents/*.md`.
+
+### Kilo Workflow Commands
+
+Slash commands are available in `claude-config/commands/` — copy to `.kilo/commands/` or `.claude/commands/`:
+
+| Command | Description | Agent |
+|-|-|-|
+| `/commit` | Task-aware git commit | code |
+| `/sprint` | Sprint open/close lifecycle | code |
+| `/research` | Deep research with Perplexity | research-analyst |
+| `/review` | Fresh-context code review | code-reviewer |
+| `/verify` | Quality gate (build, lint, test, secrets) | code |
+| `/catchup` | Restore context after /clear | general |
+| `/session-mine` | Analyze session patterns | session-analyst |
+| `/memory-sync` | Extract memories from session | memory-extractor |
+
+## Auto-Memory System
+
+This setup includes an automated memory extraction system inspired by Claude Code's internal `extractMemories.ts` pattern:
+
+### How It Works
+
+1. **`@memory-extractor` subagent** — reviews session context and writes durable memories to `memory/` directory
+2. **`memory_extract.py` script** — parses session JSONL files using pattern matching for decisions, corrections, preferences, connections, and tools
+3. **`/memory-sync` workflow** — manually trigger memory extraction from the current session
+4. **`memory-auto-extract.sh` hook** — background memory extraction at session end (optional)
+
+### Memory Directory
+
+```
+memory/
+  MEMORY.md           # Topic index (auto-maintained)
+  connections.md      # Hosts, IPs, ports, endpoints
+  decisions.md        # Architecture choices, library selections
+  lessons.md          # Corrections, wrong assumptions
+  preferences.md      # Workflow preferences, tool choices
+  tools.md            # Discovered tools and utilities
+```
+
+### What Gets Extracted
+
+| Category | Examples | Target File |
+|-|-|-|
+| Decisions | "We're using MQTT instead of HTTP for telemetry" | `decisions.md` |
+| Corrections | "Actually, the pull-up should be 4.7k not 10k" | `lessons.md` |
+| Preferences | "Always use `py` not `python` on Windows" | `preferences.md` |
+| Connections | "The MQTT broker is at 192.168.1.50:1883" | `connections.md` |
+| Tools | "Found `ruff` for Python linting" | `tools.md` |
+
+### What Does NOT Get Extracted
+
+- Secrets (API keys, passwords, tokens) — never stored
+- Code patterns derivable from reading the codebase
+- Git history or debugging solutions
+- Ephemeral task state
 
 ## How It All Fits Together
 

@@ -1,3 +1,18 @@
+---
+name: catchup
+description: >
+  Restore context after /clear — git state, branch, sprint, recent commits.
+  Lightweight context recovery without starting work.
+metadata:
+  version: "2.0"
+  effort: low
+  auto-invocable: false
+  category: workflow
+  compatible-claude-code:
+    when_to_use: "After /clear to restore project context"
+    allowed-tools: ["Bash", "Read"]
+---
+
 # Catchup Skill
 
 Usage: `/catchup [branch]`

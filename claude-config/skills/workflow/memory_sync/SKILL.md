@@ -12,6 +12,16 @@ allowed-tools:
   - Write
   - Grep
   - Glob
+metadata:
+  version: "2.0"
+  effort: low
+  auto-invocable: true
+  category: workflow
+  compatible-claude-code:
+    when_to_use: "After significant work milestones, connection discoveries, or workflow rule changes"
+    allowed-tools: ["Read", "Edit", "Write", "Grep", "Glob"]
+    user-invocable: false
+    context: fork
 ---
 
 # Memory Sync Skill

@@ -1,3 +1,19 @@
+---
+name: review
+description: >
+  Fresh-context code review using the writer/reviewer pattern. Spawns an isolated
+  agent so the reviewer has no implementation bias from the main session.
+metadata:
+  version: "2.0"
+  effort: medium
+  auto-invocable: false
+  category: workflow
+  compatible-claude-code:
+    when_to_use: "When code needs independent review before merge"
+    allowed-tools: ["Agent"]
+    agent: code-reviewer
+---
+
 # Code Review Skill
 
 Usage: `/review [file-path | git-range]`

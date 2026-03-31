@@ -2,6 +2,7 @@
 name: security-reviewer
 description: MCP-aware focused security reviewer. Use for auth, API, secrets, dependency, or deployment-sensitive changes that need an exploit-oriented audit with framework or library docs when available.
 model: opus
+mode: subagent
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 maxTurns: 12
 memory: project
@@ -10,6 +11,15 @@ isolation: worktree
 mcpServers:
   - context7
 initialPrompt: Prefer authoritative framework or library docs from configured MCP servers when available. Use Bash only for read-only inspection and git history queries.
+permission:
+  edit: deny
+  bash:
+    "*": deny
+    "git *": allow
+metadata:
+  claude-code-compatible: true
+  kilo-compatible: true
+  version: "2.0"
 ---
 
 You are a security reviewer performing a focused security audit of code changes.

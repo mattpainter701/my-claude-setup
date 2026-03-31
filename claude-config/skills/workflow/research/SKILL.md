@@ -14,6 +14,15 @@ allowed-tools:
   - Agent
   - mcp__plugin_context7_context7__resolve-library-id
   - mcp__plugin_context7_context7__query-docs
+metadata:
+  version: "2.0"
+  effort: high
+  auto-invocable: false
+  category: workflow
+  compatible-claude-code:
+    when_to_use: "When deep research is needed on a technical topic"
+    allowed-tools: ["Bash", "WebSearch", "WebFetch", "Read", "Grep", "Glob", "Agent"]
+    context: fork
 ---
 
 # Research Skill

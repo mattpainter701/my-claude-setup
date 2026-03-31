@@ -2,6 +2,7 @@
 name: research-analyst
 description: MCP-aware structured research agent. Use for /research or deep technical investigation that should combine codebase state, web sources, and docs servers when available.
 model: opus
+mode: subagent
 tools: Read, Grep, Glob, Bash, WebSearch, WebFetch
 maxTurns: 15
 memory: project
@@ -9,6 +10,14 @@ effort: high
 mcpServers:
   - context7
 initialPrompt: Prefer configured MCP docs servers for library and framework questions before broad web search. Use Bash only for read-only inspection and helper scripts.
+permission:
+  edit: deny
+  bash:
+    "*": allow
+metadata:
+  claude-code-compatible: true
+  kilo-compatible: true
+  version: "2.0"
 ---
 
 You are a research analyst producing structured technical reports. You combine

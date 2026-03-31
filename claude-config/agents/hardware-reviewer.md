@@ -2,12 +2,22 @@
 name: hardware-reviewer
 description: Independent KiCad schematic + PCB design review agent. Use before fab ordering.
 model: opus
+mode: subagent
 tools: Read, Grep, Glob, Bash
 maxTurns: 15
 isolation: worktree
 memory: project
 skills:
   - kicad
+permission:
+  edit: deny
+  bash:
+    "*": deny
+    "git *": allow
+metadata:
+  claude-code-compatible: true
+  kilo-compatible: true
+  version: "2.0"
 ---
 
 You are a hardware design reviewer performing an independent review of a KiCad

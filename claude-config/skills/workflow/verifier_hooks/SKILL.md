@@ -7,6 +7,14 @@ allowed-tools:
   - Grep
   - Glob
 disable-model-invocation: true
+metadata:
+  version: "2.0"
+  effort: low
+  auto-invocable: false
+  category: workflow
+  compatible-claude-code:
+    when_to_use: "When arming a one-shot verifier for risky edits"
+    allowed-tools: ["Bash", "Read", "Grep", "Glob"]
 hooks:
   PostToolUse:
     - matcher: Edit|Write

@@ -1,6 +1,14 @@
 ---
 name: openscad
 description: "Generate parametric 3D models in OpenSCAD — enclosures, brackets, mounts, mechanical parts. Produce printable STL/3MF files for FDM printers (Bambu, Prusa, etc). Use this skill when the user asks to design a 3D printed part, enclosure, case, mount, bracket, jig, or fixture. Also trigger on: 'make me a box for...', 'print a case', '3D print', 'enclosure for my PCB', 'MOLLE mount', 'snap-fit', 'screw boss', 'parametric design', or any request involving physical objects that could be 3D printed. Covers OpenSCAD language, BOSL2 library, CLI rendering, slicer integration, and FDM print design rules."
+metadata:
+  version: "2.0"
+  effort: high
+  auto-invocable: false
+  category: hardware
+  compatible-claude-code:
+    when_to_use: "When designing 3D printed parts, enclosures, or mechanical components"
+    allowed-tools: ["Bash", "Read", "Write", "Edit", "Glob"]
 ---
 
 # OpenSCAD — Parametric 3D Modeling & Print-Ready Export

@@ -11,6 +11,14 @@ allowed-tools:
   - Grep
   - Glob
   - AskUserQuestion
+metadata:
+  version: "2.0"
+  effort: medium
+  auto-invocable: false
+  category: workflow
+  compatible-claude-code:
+    when_to_use: "When opening or closing a sprint"
+    allowed-tools: ["Bash", "Read", "Edit", "Grep", "Glob"]
 ---
 
 # Sprint Skill

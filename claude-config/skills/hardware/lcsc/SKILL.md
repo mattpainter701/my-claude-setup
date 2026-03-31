@@ -1,6 +1,14 @@
 ---
 name: lcsc
 description: Search LCSC Electronics for electronic components — find parts by LCSC number (Cxxxxx) or MPN, check stock/pricing, download datasheets, analyze specifications. Sister company to JLCPCB, same parts library. Sync and maintain a local datasheets directory for a KiCad project. No API key needed — uses the free jlcsearch community API. Use this skill when the user mentions LCSC, JLCPCB parts library, JLCPCB assembly parts, production sourcing, Cxxxxx part numbers, needs to find LCSC equivalents for parts, is preparing a BOM for JLCPCB assembly, or wants to download datasheets and LCSC is available. For package cross-reference tables and BOM workflow, see the `bom` skill.
+metadata:
+  version: "2.0"
+  effort: medium
+  auto-invocable: false
+  category: hardware
+  compatible-claude-code:
+    when_to_use: "When searching LCSC for components or preparing JLCPCB assembly BOMs"
+    allowed-tools: ["Bash", "Read", "Grep", "Glob"]
 ---
 
 # LCSC Electronics — Component Search, Datasheets & Ordering

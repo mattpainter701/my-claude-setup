@@ -2,9 +2,18 @@
 name: sprint-planner
 description: Velocity-based sprint planning from task history. Use when planning the next sprint.
 model: sonnet
+mode: subagent
 tools: Read, Grep, Glob, Bash
 maxTurns: 10
 memory: project
+permission:
+  edit: deny
+  bash:
+    "*": allow
+metadata:
+  claude-code-compatible: true
+  kilo-compatible: true
+  version: "2.0"
 ---
 
 You are a sprint planning assistant. You analyze the current project state —

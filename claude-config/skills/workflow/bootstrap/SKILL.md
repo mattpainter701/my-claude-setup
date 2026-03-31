@@ -10,6 +10,14 @@ allowed-tools:
   - Edit
   - Write
 disable-model-invocation: true
+metadata:
+  version: "2.0"
+  effort: medium
+  auto-invocable: false
+  category: workflow
+  compatible-claude-code:
+    when_to_use: "When bootstrapping or refreshing a Claude Code/Kilo setup"
+    allowed-tools: ["Bash", "Read", "Grep", "Glob", "Edit", "Write"]
 ---
 
 # Bootstrap Skill

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "skills": {
+    "paths": [
+      "./claude-config/skills/workflow",
+      "./claude-config/skills/hardware",
+      "./claude-config/skills/auto"
+    ]
+  },
+  "agent": {
+    "code-reviewer": {
+      "description": "Fresh-context code reviewer. Use for /review or when code needs independent review before merge.",
+      "mode": "subagent",
+      "model": "anthropic/claude-opus-4-20250514",
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "deny",
+          "git *": "allow"
+        }
+      }
+    },
+    "memory-extractor": {
+      "description": "Auto-extracts durable memories from session context — decisions, corrections, preferences, connection methods.",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-20250514",
+      "hidden": true,
+      "permission": {
+        "edit": "deny",
+        "write": {
+          "*": "deny",
+          "*/memory/*": "allow"
+        },
+        "bash": {
+          "*": "deny",
+          "ls*": "allow",
+          "cat*": "allow",
+          "stat*": "allow"
+        }
+      }
+    }
+  }
+}

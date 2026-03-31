@@ -1,6 +1,14 @@
 ---
 name: element14
 description: Search Newark, Farnell, and element14 for electronic components — find parts by MPN or distributor part number, check pricing/stock, download datasheets, analyze specifications. One unified API covers all three storefronts (Newark for US, Farnell for UK/EU, element14 for APAC). Free API key, simple query-parameter auth, no OAuth. Datasheets download directly from farnell.com CDN with no bot protection. Sync and maintain a local datasheets directory for a KiCad project. Use this skill when the user mentions Newark, Farnell, element14, needs parts from a non-US distributor, wants to compare pricing across regions, or needs datasheets from a source that doesn't require complex API auth. For package cross-reference tables and BOM workflow, see the `bom` skill.
+metadata:
+  version: "2.0"
+  effort: medium
+  auto-invocable: false
+  category: hardware
+  compatible-claude-code:
+    when_to_use: "When searching element14/Newark/Farnell for components or datasheets"
+    allowed-tools: ["Bash", "Read", "Grep", "Glob"]
 ---
 
 # element14 / Newark / Farnell — Component Search, Datasheets & Ordering
