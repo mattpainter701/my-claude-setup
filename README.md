@@ -5,11 +5,11 @@ A production-grade Claude Code configuration with 25 skills, 9 specialized agent
 ```
   ╔════════════════════════════════════════════════════════════════════╗
   ║                                                                    ║
-  ║   Claude Code Configuration • 25 Skills • 9 Agents • Auto-Memory  ║
+  ║   Claude Code Configuration • 30 Skills • 9 Agents • Auto-Memory  ║
   ║                                                                    ║
   ║   Workflow  |  Hardware  |  Auto-Invoke  |  Agents  |  Hooks     ║
   ║   ========     =========     ============     =======     =====   ║
-  ║     11          10              4              9           15    ║
+  ║     12          10              8              9           18    ║
   ║                                                                    ║
   ╚════════════════════════════════════════════════════════════════════╝
 ```
@@ -28,20 +28,20 @@ A production-grade Claude Code configuration with 25 skills, 9 specialized agent
                  │                             │                             │
         ┌────────▼──────────┐       ┌──────────▼──────────┐       ┌─────────▼──────────┐
         │    WORKFLOW       │       │    HARDWARE        │       │   AUTO-INVOKE      │
-        │   (11 Skills)     │       │  (10 Skills)       │       │  (4 Skills)        │
+        │   (12 Skills)     │       │  (10 Skills)       │       │  (8 Skills)        │
         ├──────────────────┤       ├────────────────────┤       ├────────────────────┤
         │ • commit         │       │ • kicad            │       │ • skill_authoring  │
         │ • review         │       │ • bom              │       │ • hook_authoring   │
         │ • research       │       │ • digikey          │       │ • agent_authoring  │
         │ • sprint         │       │ • mouser           │       │ • memory-extract   │
-        │ • verify         │       │ • lcsc             │       │                    │
-        │ • catchup        │       │ • element14        │       │ [path-scoped]      │
-        │ • memory_sync    │       │ • jlcpcb           │       │ [auto-triggered]   │
-        │ • session_mine   │       │ • pcbway           │       │                    │
-        │ • doctor         │       │ • openscad         │       │                    │
-        │ • bootstrap      │       │ • ee               │       │                    │
-        │ • verifier_hooks │       │ • (4 analysis      │       │                    │
-        │                  │       │    scripts)        │       │                    │
+        │ • verify         │       │ • lcsc             │       │ • crg-debug-issue  │
+        │ • catchup        │       │ • element14        │       │ • crg-explore-     │
+        │ • memory_sync    │       │ • jlcpcb           │       │   codebase         │
+        │ • session_mine   │       │ • pcbway           │       │ • crg-refactor-    │
+        │ • doctor         │       │ • openscad         │       │   safely           │
+        │ • bootstrap      │       │ • ee               │       │ • crg-review-      │
+        │ • verifier_hooks │       │ • (4 analysis      │       │   changes          │
+        │ • circuit-weaver │       │    scripts)        │       │ [path-scoped]      │
         └──────────────────┘       └────────────────────┘       └────────────────────┘
 ```
 
@@ -151,6 +151,7 @@ A production-grade Claude Code configuration with 25 skills, 9 specialized agent
 my-claude-setup/
   claude-config/               # Global Claude Code configuration
     CLAUDE.global.md           # Global rules (all projects)
+    settings.json              # Global settings (hooks, permissions, env)
     project-stencil/
       CLAUDE.project.md        # Project-level rules template
     skills/
@@ -170,6 +171,10 @@ my-claude-setup/
         hook_authoring/        # Hidden path-scoped guidance for hook work
         skill_authoring/       # Hidden path-scoped guidance for skill work
         agent_authoring/       # Hidden path-scoped guidance for agent work
+        crg-debug-issue/       # CRG: debug issues via dependency graph
+        crg-explore-codebase/  # CRG: explore codebase structure
+        crg-refactor-safely/   # CRG: refactor with impact-radius analysis
+        crg-review-changes/    # CRG: review changes with affected-flows context
       hardware/                # Hardware design and sourcing skills
         kicad/                 # Schematic, PCB, Gerber analysis
         bom/                   # BOM lifecycle management
@@ -210,6 +215,8 @@ my-claude-setup/
       perplexity_search.py     # Perplexity Sonar API wrapper (stdlib only)
       session_mine.py          # Session log mining for workflow analysis
       memory_extract.py        # Auto memory extraction from session JSONL
+      mempalace-weekly-refresh.sh  # Weekly MemPalace index refresh
+      token-check.sh           # Token budget headroom check
     commands/                  # Kilo/Claude Code slash commands
       commit.md                # /commit workflow
       sprint.md                # /sprint workflow
@@ -500,7 +507,7 @@ Project-agnostic rules that apply everywhere:
 
 ```
   ┌──────────────────────────────────────────────────────────────────┐
-  │                    11 WORKFLOW SKILLS                            │
+  │                    12 WORKFLOW SKILLS                            │
   ├──────────────────────────────────────────────────────────────────┤
   │                                                                   │
   │ • /commit ─────────→ Task-aware conventional commits             │
@@ -514,10 +521,12 @@ Project-agnostic rules that apply everywhere:
   │ • /doctor ─────────→ Validate setup health                       │
   │ • /bootstrap ──────→ Install/refresh global or project config    │
   │ • /verifier_hooks ─→ Arm post-edit agent verifier                │
+  │ • /circuit-weaver ─→ IC selection + schematic generation wizard  │
   │                                                                   │
-  │ + 4 Hidden Auto-Skills (trigger on file type)                    │
+  │ + 8 Hidden Auto-Skills (trigger on file type / CRG context)      │
   │   → skill_authoring, hook_authoring, agent_authoring,            │
-  │     memory-extraction                                            │
+  │     memory-extraction, crg-debug-issue, crg-explore-codebase,    │
+  │     crg-refactor-safely, crg-review-changes                      │
   │                                                                   │
   └──────────────────────────────────────────────────────────────────┘
 ```
@@ -533,6 +542,7 @@ Project-agnostic rules that apply everywhere:
 | `/doctor [quick\|full]` | Setup audit | Validates ~/.claude wiring, helper scripts, hooks, and optional project setup |
 | `/bootstrap [global\|project\|mcp\|statusline]` | Setup / refresh | Installs or refreshes global/project stencils, MCP wiring, and statusline setup |
 | `/verifier_hooks` | Risky next edit | Arms a one-shot post-edit agent verifier for the next `Edit` or `Write` |
+| `/circuit-weaver` | New circuit design | IC selection wizard + research-driven passive generation + schematic output |
 
 ### Hardware Skills
 
@@ -598,12 +608,17 @@ Project-agnostic rules that apply everywhere:
 |-|-|-|
 | `auto-lint.sh` | PostToolUse (Edit/Write) | Runs `ruff check --fix` + `ruff format` on .py files |
 | `block-coauthored.sh` | PreToolUse (Bash) | Hard-blocks `git commit` containing Co-Authored-By |
+| `block-no-verify.sh` | PreToolUse (Bash) | Hard-blocks `git commit --no-verify` flag |
+| `warn-git-push.sh` | PreToolUse (Bash) | Warns before `git push` to remote |
 | `notify-done.sh` | Stop | Ascending chirp on success, descending tone on error |
 | `notify-permission.sh` | Notification | Windows toast + beep when permission needed |
 | `session-context.sh` | SessionStart | Injects version, branch, commits, sprint on resume/compact/clear |
+| `pre-compact-save.sh` | PreCompact | Saves context snapshot before compaction |
 | `log-hook-event.sh` | SubagentStop/SessionEnd | JSONL event logging for session analysis |
 | `memory-auto-extract.sh` | Stop | Background memory extraction at session end |
 | `skill-discovery.sh` | SessionStart | Reports available skills count at session start |
+| `token-metrics-start.sh` | PreToolUse | Records token baseline at turn start |
+| `token-metrics-end.sh` | PostToolUse | Logs token delta per turn for metrics |
 
 **Project hook stencils** (copy and customize):
 
@@ -768,12 +783,48 @@ memory/
 - Git history or debugging solutions
 - Ephemeral task state
 
+## MemPalace Integration
+
+[MemPalace](https://github.com/MemPalace/mempalace) is a semantic memory MCP server that provides a structured knowledge graph alongside Claude's built-in auto-memory. It stores entities and relationships in a per-project `mempalace.yaml` and `entities.json`.
+
+These per-project files are **excluded from this repo** via `.gitignore` (issue #185) — they contain project-specific memory that varies per machine and should not be committed to the config backup repo.
+
+**Key files:**
+
+| File | Purpose | In Repo? |
+|-|-|-|
+| `mempalace.yaml` | Per-project MemPalace config | No — gitignored |
+| `entities.json` | Per-project entity graph | No — gitignored |
+| `scripts/mempalace-weekly-refresh.sh` | Weekly MemPalace index refresh automation | Yes |
+
+**MCP tools available** (when MemPalace server is running):
+- `mempalace_search` — semantic search across stored memories
+- `mempalace_add_drawer` / `mempalace_update_drawer` — store new memories
+- `mempalace_kg_add` / `mempalace_kg_query` — knowledge graph operations
+
+## Token Optimization Infrastructure
+
+This setup includes tooling to minimize token spend and navigate large codebases efficiently.
+
+**Code Review Graph (CRG)** — installed globally via `code-review-graph` MCP server. Builds a Tree-sitter dependency graph per project, then provides impact-radius analysis, affected-flow queries, and semantic search. Four CRG skills are included:
+
+| Skill | Use Case |
+|-|-|
+| `crg-debug-issue` | Navigate to the root cause via dependency subgraph |
+| `crg-explore-codebase` | Map architecture without reading full files |
+| `crg-refactor-safely` | Find all callers/callees before a refactor |
+| `crg-review-changes` | Review a diff with full affected-flows context |
+
+**Token metrics hooks** — `token-metrics-start.sh` (PreToolUse) and `token-metrics-end.sh` (PostToolUse) track per-turn token deltas. Use `scripts/token-check.sh` to check budget headroom in long sessions.
+
+**Setup:** Run `code-review-graph build` in each project root to generate the graph. The `PostToolUse` hook `code-review-graph update --skip-flows` keeps the graph current after every edit (silent no-op on projects without a graph).
+
 ## How It All Fits Together
 
 ```
 ~/.claude/
   CLAUDE.md              ← from CLAUDE.global.md
-  settings.json          ← hook wiring (manual setup)
+  settings.json          ← from claude-config/settings.json (hooks, permissions, env)
   hooks/                 ← from hooks/global/
   agents/                ← from agents/
   scripts/               ← perplexity_search.py + session_mine.py + claude_doctor.py
@@ -788,10 +839,15 @@ memory/
     doctor/
     bootstrap/
     verifier_hooks/
+    circuit-weaver/      ← IC selection + schematic generation wizard
     hook_authoring/      ← auto-activates on hook files
     skill_authoring/     ← auto-activates on skill files
     agent_authoring/     ← auto-activates on agent files
     memory-extraction/   ← hidden auto memory helper
+    crg-debug-issue/     ← CRG: debug issues via dependency graph
+    crg-explore-codebase/ ← CRG: explore codebase structure
+    crg-refactor-safely/ ← CRG: refactor with impact-radius analysis
+    crg-review-changes/  ← CRG: review changes with affected-flows context
     kicad/               ← from skills/hardware/
     bom/
     digikey/
