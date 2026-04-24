@@ -32,8 +32,14 @@
       "permission": {
         "edit": "deny",
         "bash": {
-          "*": "deny",
-          "git *": "allow"
+          "*": "allow",
+          "git push*": "deny",
+          "git commit*": "deny",
+          "git add*": "deny",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item*": "deny",
+          "rmdir *": "deny"
         }
       }
     },
@@ -44,8 +50,14 @@
       "permission": {
         "edit": "deny",
         "bash": {
-          "*": "deny",
-          "git *": "allow"
+          "*": "allow",
+          "git push*": "deny",
+          "git commit*": "deny",
+          "git add*": "deny",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item*": "deny",
+          "rmdir *": "deny"
         }
       }
     },
@@ -56,9 +68,14 @@
       "permission": {
         "edit": "deny",
         "bash": {
-          "*": "deny",
-          "python3 *": "allow",
-          "py *": "allow"
+          "*": "allow",
+          "git push*": "deny",
+          "git commit*": "deny",
+          "git add*": "deny",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item*": "deny",
+          "rmdir *": "deny"
         }
       }
     },
@@ -69,10 +86,14 @@
       "permission": {
         "edit": "deny",
         "bash": {
-          "*": "deny",
-          "py *": "allow",
-          "python3 *": "allow",
-          "git *": "allow"
+          "*": "allow",
+          "git push*": "deny",
+          "git commit*": "deny",
+          "git add*": "deny",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item*": "deny",
+          "rmdir *": "deny"
         }
       }
     },
@@ -82,11 +103,19 @@
       "model": "anthropic/claude-sonnet-4-20250514",
       "permission": {
         "edit": "deny",
-        "bash": {
+        "write": {
           "*": "deny",
-          "py *": "allow",
-          "python3 *": "allow",
-          "git *": "allow"
+          "*/bom/*": "allow"
+        },
+        "bash": {
+          "*": "allow",
+          "git push*": "deny",
+          "git commit*": "deny",
+          "git add*": "deny",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item*": "deny",
+          "rmdir *": "deny"
         }
       }
     },
@@ -97,11 +126,14 @@
       "permission": {
         "edit": "deny",
         "bash": {
-          "*": "deny",
-          "git *": "allow",
-          "npm *": "allow",
-          "py *": "allow",
-          "python3 *": "allow"
+          "*": "allow",
+          "git push*": "deny",
+          "git commit*": "deny",
+          "git add*": "deny",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item*": "deny",
+          "rmdir *": "deny"
         }
       }
     },
@@ -112,8 +144,14 @@
       "permission": {
         "edit": "deny",
         "bash": {
-          "*": "deny",
-          "git *": "allow"
+          "*": "allow",
+          "git push*": "deny",
+          "git commit*": "deny",
+          "git add*": "deny",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item*": "deny",
+          "rmdir *": "deny"
         }
       }
     },
@@ -124,11 +162,14 @@
       "permission": {
         "edit": "deny",
         "bash": {
-          "*": "deny",
-          "py *": "allow",
-          "python3 *": "allow",
-          "ls *": "allow",
-          "cat *": "allow"
+          "*": "allow",
+          "git push*": "deny",
+          "git commit*": "deny",
+          "git add*": "deny",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item*": "deny",
+          "rmdir *": "deny"
         }
       }
     },
@@ -144,10 +185,14 @@
           "*/memory/*": "allow"
         },
         "bash": {
-          "*": "deny",
-          "ls*": "allow",
-          "cat*": "allow",
-          "stat*": "allow"
+          "*": "allow",
+          "git push*": "deny",
+          "git commit*": "deny",
+          "git add*": "deny",
+          "rm *": "deny",
+          "del *": "deny",
+          "Remove-Item*": "deny",
+          "rmdir *": "deny"
         }
       }
     }
