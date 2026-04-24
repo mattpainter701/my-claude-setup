@@ -5,11 +5,11 @@ A production-grade Claude Code configuration with 25 skills, 9 specialized agent
 ```
   ╔════════════════════════════════════════════════════════════════════╗
   ║                                                                    ║
-  ║   Claude Code Configuration • 30 Skills • 9 Agents • Auto-Memory  ║
+  ║   Claude Code Configuration • 29 Skills • 9 Agents • Auto-Memory  ║
   ║                                                                    ║
   ║   Workflow  |  Hardware  |  Auto-Invoke  |  Agents  |  Hooks     ║
   ║   ========     =========     ============     =======     =====   ║
-  ║     12          10              8              9           18    ║
+  ║     11          10              8              9           18    ║
   ║                                                                    ║
   ╚════════════════════════════════════════════════════════════════════╝
 ```
@@ -41,7 +41,7 @@ A production-grade Claude Code configuration with 25 skills, 9 specialized agent
         │ • doctor         │       │ • openscad         │       │   safely           │
         │ • bootstrap      │       │ • ee               │       │ • crg-review-      │
         │ • verifier_hooks │       │ • (4 analysis      │       │   changes          │
-        │ • circuit-weaver │       │    scripts)        │       │ [path-scoped]      │
+        │                  │       │    scripts)        │       │ [path-scoped]      │
         └──────────────────┘       └────────────────────┘       └────────────────────┘
 ```
 
@@ -521,7 +521,6 @@ Project-agnostic rules that apply everywhere:
   │ • /doctor ─────────→ Validate setup health                       │
   │ • /bootstrap ──────→ Install/refresh global or project config    │
   │ • /verifier_hooks ─→ Arm post-edit agent verifier                │
-  │ • /circuit-weaver ─→ IC selection + schematic generation wizard  │
   │                                                                   │
   │ + 8 Hidden Auto-Skills (trigger on file type / CRG context)      │
   │   → skill_authoring, hook_authoring, agent_authoring,            │
@@ -542,7 +541,6 @@ Project-agnostic rules that apply everywhere:
 | `/doctor [quick\|full]` | Setup audit | Validates ~/.claude wiring, helper scripts, hooks, and optional project setup |
 | `/bootstrap [global\|project\|mcp\|statusline]` | Setup / refresh | Installs or refreshes global/project stencils, MCP wiring, and statusline setup |
 | `/verifier_hooks` | Risky next edit | Arms a one-shot post-edit agent verifier for the next `Edit` or `Write` |
-| `/circuit-weaver` | New circuit design | IC selection wizard + research-driven passive generation + schematic output |
 
 ### Hardware Skills
 
@@ -839,7 +837,6 @@ This setup includes tooling to minimize token spend and navigate large codebases
     doctor/
     bootstrap/
     verifier_hooks/
-    circuit-weaver/      ← IC selection + schematic generation wizard
     hook_authoring/      ← auto-activates on hook files
     skill_authoring/     ← auto-activates on skill files
     agent_authoring/     ← auto-activates on agent files
