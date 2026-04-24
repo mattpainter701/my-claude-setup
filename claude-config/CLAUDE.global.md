@@ -123,6 +123,48 @@ current sprint/task numbers, the specific bug or feature being worked on.
 5. Before marking work DONE, run at least one direct probe for the contract most likely to drift.
 6. When using mock data or placeholder variables, document each instance (location, what it replaces, what real values look like) so they can be refined later.
 
+## Token Optimization Strategy
+
+### 1. Code Review Graph (Structural Analysis)
+- Use **Glob** and **Grep** as primary navigation tools, not `cat`/`head`/`tail`.
+- On large monorepos, use the **Explore agent** (`subagent_type: "Explore"`) for smart codebase queries instead of whole-file reads.
+- Read only the dependency subgraph relevant to a change. Before reading a large file:
+  - Use Grep to locate the specific function/symbol.
+  - Read only that section with `offset`/`limit` parameters.
+  - Avoid dumping entire files into context.
+- For code review or refactoring tasks, use the Explore agent to map dependencies first.
+
+### 2. Claude Token Efficient (Terseness)
+- **Never echo file contents** — the user can see tool output.
+- **No narration** of tool calls ("Let me read...", "Now I'll edit..."). Just do it.
+- **No trailing summaries** unless user explicitly requests one.
+- **No explanations of obvious code** — if logic is self-evident, skip it.
+- **Lead with the answer**, not reasoning. Result first, then minimal context.
+- **Skip filler words** — remove preamble and unnecessary transitions.
+- Prefer terse, direct sentences over long explanations.
+- **One-sentence rule**: If it fits in one sentence, don't use three.
+
+### 3. Token Savior (Symbol-Level Navigation via Memory)
+- Store APIs, key functions, module structure, and architecture in **project memory** (`memory/MEMORY.md`).
+- Save symbol-level findings (function signatures, class hierarchies, module boundaries) instead of inline explanations.
+- When referencing codebase structure, **cite memory by symbol name** (e.g., "per memory, `AuthHandler.login()` handles JWT creation").
+- Update memory when discovering new module patterns, exported APIs, or internal contracts.
+- Use memory to replace repetitive codebase explanations across conversation turns.
+
+### 4. Session Efficiency (from claude-token-efficient)
+- **Do not re-read files** you have already read in the current session unless the file may have changed.
+- **Skip files over 100KB** unless explicitly required for the task — grep/offset/limit read only what's needed.
+- **Suggest `/cost`** when a session feels long so the user can monitor cache ratio.
+- **No sycophantic openers or closing fluff** — no "Great question!", "Happy to help!", trailing recap paragraphs.
+
+### 5. Code Review Graph MCP (installed)
+- **Installed globally** as user-scope MCP server (`code-review-graph serve`).
+- Per-project setup: run `code-review-graph build` in each project root to generate the Tree-sitter graph.
+- MCP tools available: `detect_changes`, `get_impact_radius`, `get_affected_flows`, `query_graph`, `semantic_search_nodes`, `list_communities`, `get_architecture_overview`, etc.
+- Global skills installed: `crg-debug-issue`, `crg-explore-codebase`, `crg-refactor-safely`, `crg-review-changes`.
+- PostToolUse hook: `code-review-graph update --skip-flows` runs after Edit/Write to keep graph current (silent no-op on projects without a graph).
+- **Prefer CRG tools over raw Grep for codebase navigation** once a graph exists — they return dependency subgraphs instead of file dumps.
+
 ## Self-Maintenance
 When you notice any of these during a session, update the relevant CLAUDE.md or memory file **proactively** (don't wait to be asked):
 - A new connection method, host, or credential pattern was used
