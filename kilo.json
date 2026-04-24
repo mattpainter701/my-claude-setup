@@ -1,5 +1,22 @@
 {
   "$schema": "https://app.kilo.ai/config.json",
+  "instructions": [
+    "./claude-config/CLAUDE.global.md"
+  ],
+  "mcp": {
+    "mempalace": {
+      "type": "local",
+      "command": ["py", "-m", "mempalace", "mcp"],
+      "enabled": true,
+      "timeout": 10000
+    },
+    "code-review-graph": {
+      "type": "local",
+      "command": ["code-review-graph", "serve"],
+      "enabled": true,
+      "timeout": 10000
+    }
+  },
   "skills": {
     "paths": [
       "./claude-config/skills/workflow",
