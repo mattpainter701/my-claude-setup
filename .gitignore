@@ -5,3 +5,10 @@ datasheets/
 *.bak
 .DS_Store
 Thumbs.db
+
+# MemPalace per-project files (issue #185)
+mempalace.yaml
+entities.json
+
+# circuit-weaver — managed in its own repo
+claude-config/skills/workflow/circuit-weaver/
