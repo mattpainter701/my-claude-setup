@@ -20,6 +20,101 @@
         }
       }
     },
+    "security-reviewer": {
+      "description": "MCP-aware focused security reviewer. Use for auth, API, secrets, dependency, or deployment-sensitive changes that need an exploit-oriented audit with framework or library docs when available.",
+      "mode": "subagent",
+      "model": "anthropic/claude-opus-4-20250514",
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "deny",
+          "git *": "allow"
+        }
+      }
+    },
+    "hardware-reviewer": {
+      "description": "Independent KiCad schematic + PCB design review agent. Use before fab ordering.",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-20250514",
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "deny",
+          "python3 *": "allow",
+          "py *": "allow"
+        }
+      }
+    },
+    "research-analyst": {
+      "description": "MCP-aware structured research agent. Use for /research or deep technical investigation that should combine codebase state, web sources, and docs servers when available.",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-20250514",
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "deny",
+          "py *": "allow",
+          "python3 *": "allow",
+          "git *": "allow"
+        }
+      }
+    },
+    "bom-auditor": {
+      "description": "BOM completeness, sourcing risk, and cost optimization auditor. Use before ordering components.",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-20250514",
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "deny",
+          "py *": "allow",
+          "python3 *": "allow",
+          "git *": "allow"
+        }
+      }
+    },
+    "deployment-validator": {
+      "description": "Pre-deploy safety checklist agent. Use before shipping code to production or embedded devices.",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-20250514",
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "deny",
+          "git *": "allow",
+          "npm *": "allow",
+          "py *": "allow",
+          "python3 *": "allow"
+        }
+      }
+    },
+    "sprint-planner": {
+      "description": "Velocity-based sprint planning from task history. Use when planning the next sprint.",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-20250514",
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "deny",
+          "git *": "allow"
+        }
+      }
+    },
+    "session-analyst": {
+      "description": "Analyzes Claude Code session logs for patterns and improvement opportunities.",
+      "mode": "subagent",
+      "model": "anthropic/claude-sonnet-4-20250514",
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "deny",
+          "py *": "allow",
+          "python3 *": "allow",
+          "ls *": "allow",
+          "cat *": "allow"
+        }
+      }
+    },
     "memory-extractor": {
       "description": "Auto-extracts durable memories from session context — decisions, corrections, preferences, connection methods.",
       "mode": "subagent",
