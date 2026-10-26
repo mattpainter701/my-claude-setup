@@ -32,14 +32,8 @@
       "permission": {
         "edit": "deny",
         "bash": {
-          "*": "allow",
-          "git push*": "deny",
-          "git commit*": "deny",
-          "git add*": "deny",
-          "rm *": "deny",
-          "del *": "deny",
-          "Remove-Item*": "deny",
-          "rmdir *": "deny"
+          "*": "deny",
+          "git *": "allow"
         }
       }
     },
@@ -50,14 +44,8 @@
       "permission": {
         "edit": "deny",
         "bash": {
-          "*": "allow",
-          "git push*": "deny",
-          "git commit*": "deny",
-          "git add*": "deny",
-          "rm *": "deny",
-          "del *": "deny",
-          "Remove-Item*": "deny",
-          "rmdir *": "deny"
+          "*": "deny",
+          "git *": "allow"
         }
       }
     },
@@ -68,14 +56,9 @@
       "permission": {
         "edit": "deny",
         "bash": {
-          "*": "allow",
-          "git push*": "deny",
-          "git commit*": "deny",
-          "git add*": "deny",
-          "rm *": "deny",
-          "del *": "deny",
-          "Remove-Item*": "deny",
-          "rmdir *": "deny"
+          "*": "deny",
+          "python3 *": "allow",
+          "py *": "allow"
         }
       }
     },
@@ -86,14 +69,10 @@
       "permission": {
         "edit": "deny",
         "bash": {
-          "*": "allow",
-          "git push*": "deny",
-          "git commit*": "deny",
-          "git add*": "deny",
-          "rm *": "deny",
-          "del *": "deny",
-          "Remove-Item*": "deny",
-          "rmdir *": "deny"
+          "*": "deny",
+          "py *": "allow",
+          "python3 *": "allow",
+          "git *": "allow"
         }
       }
     },
@@ -105,17 +84,14 @@
         "edit": "deny",
         "write": {
           "*": "deny",
-          "*/bom/*": "allow"
+          "bom/audit-*": "allow",
+          "*/bom/audit-*": "allow"
         },
         "bash": {
-          "*": "allow",
-          "git push*": "deny",
-          "git commit*": "deny",
-          "git add*": "deny",
-          "rm *": "deny",
-          "del *": "deny",
-          "Remove-Item*": "deny",
-          "rmdir *": "deny"
+          "*": "deny",
+          "py *": "allow",
+          "python3 *": "allow",
+          "git *": "allow"
         }
       }
     },
@@ -126,14 +102,11 @@
       "permission": {
         "edit": "deny",
         "bash": {
-          "*": "allow",
-          "git push*": "deny",
-          "git commit*": "deny",
-          "git add*": "deny",
-          "rm *": "deny",
-          "del *": "deny",
-          "Remove-Item*": "deny",
-          "rmdir *": "deny"
+          "*": "deny",
+          "git *": "allow",
+          "npm *": "allow",
+          "py *": "allow",
+          "python3 *": "allow"
         }
       }
     },
@@ -144,14 +117,8 @@
       "permission": {
         "edit": "deny",
         "bash": {
-          "*": "allow",
-          "git push*": "deny",
-          "git commit*": "deny",
-          "git add*": "deny",
-          "rm *": "deny",
-          "del *": "deny",
-          "Remove-Item*": "deny",
-          "rmdir *": "deny"
+          "*": "deny",
+          "git *": "allow"
         }
       }
     },
@@ -162,14 +129,11 @@
       "permission": {
         "edit": "deny",
         "bash": {
-          "*": "allow",
-          "git push*": "deny",
-          "git commit*": "deny",
-          "git add*": "deny",
-          "rm *": "deny",
-          "del *": "deny",
-          "Remove-Item*": "deny",
-          "rmdir *": "deny"
+          "*": "deny",
+          "py *": "allow",
+          "python3 *": "allow",
+          "ls *": "allow",
+          "cat *": "allow"
         }
       }
     },
@@ -185,14 +149,10 @@
           "*/memory/*": "allow"
         },
         "bash": {
-          "*": "allow",
-          "git push*": "deny",
-          "git commit*": "deny",
-          "git add*": "deny",
-          "rm *": "deny",
-          "del *": "deny",
-          "Remove-Item*": "deny",
-          "rmdir *": "deny"
+          "*": "deny",
+          "ls*": "allow",
+          "cat*": "allow",
+          "stat*": "allow"
         }
       }
     }

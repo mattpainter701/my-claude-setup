@@ -12,14 +12,8 @@ skills:
 permission:
   edit: deny
   bash:
-    "*": allow
-    "git push*": deny
-    "git commit*": deny
-    "git add*": deny
-    "rm *": deny
-    "del *": deny
-    "Remove-Item*": deny
-    "rmdir *": deny
+    "*": deny
+    "git *": allow
 metadata:
   claude-code-compatible: true
   kilo-compatible: true
