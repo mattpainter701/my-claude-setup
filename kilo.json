@@ -82,6 +82,11 @@
       "model": "anthropic/claude-sonnet-4-20250514",
       "permission": {
         "edit": "deny",
+        "write": {
+          "*": "deny",
+          "bom/audit-*": "allow",
+          "*/bom/audit-*": "allow"
+        },
         "bash": {
           "*": "deny",
           "py *": "allow",

@@ -992,3 +992,17 @@ User: "Design a snap-fit enclosure for my 60x40mm PCB with USB-C and 2 SMA ports
 ## License
 
 MIT
+
+## Circuit Weaver command definitions
+
+The command bundle adds `/audit-bom`, `/confidence`, `/discover`, `/generate`,
+`/simulate` and `/validate`. Check the installed `circuit-weaver <command> --help`
+when using a different engine release. These definitions do not change the
+engine's validation, simulation or manufacturing acceptance gates.
+
+Existing agent shell permissions are preserved. The BOM auditor can write
+generated reports matching `bom/audit-*` within the current worktree, including
+nested project BOM directories. It must preserve source BOMs, schematics and
+CSVs. File-tool patterns are worktree-relative; shell permissions remain a
+separate policy, not a claim of process sandboxing. See the
+[Kilo agent permission rules](https://kilo.ai/docs/customize/agent-permissions).
